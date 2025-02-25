@@ -7,7 +7,7 @@ import static org.mockito.ArgumentMatchers.any;
 import app.dto.user.UserLoginRequestDto;
 import app.exception.AuthenticationException;
 import app.model.User;
-import app.repository.user.UserRepository;
+import app.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

@@ -1,6 +1,6 @@
 package app.security;
 
-import app.repository.user.UserRepository;
+import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

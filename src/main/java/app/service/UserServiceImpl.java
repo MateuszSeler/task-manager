@@ -6,7 +6,7 @@ import app.exception.EntityNotFoundException;
 import app.exception.RegistrationException;
 import app.mapper.UserMapper;
 import app.model.User;
-import app.repository.user.UserRepository;
+import app.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -39,7 +39,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto findByEmail(String email) {
+    public UserResponseDto getByEmail(String email) {
         return userMapper.toDto(userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("User with email: " + email + " not found")));
     }

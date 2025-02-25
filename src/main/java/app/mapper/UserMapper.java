@@ -3,10 +3,10 @@ package app.mapper;
 import app.config.MapperConfig;
 import app.dto.user.UserRegistrationRequestDto;
 import app.dto.user.UserResponseDto;
-import app.exception.EntityNotFoundException;
 import app.model.User;
-import app.repository.user.UserRepository;
-import org.mapstruct.Context;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
 import org.mapstruct.Named;
 
@@ -16,11 +16,28 @@ public interface UserMapper {
 
     User toModel(UserRegistrationRequestDto registrationRequestDto);
 
-    @Named("fromUserIdToUser")
-    default User fromUserIdToUser(Long userId, @Context UserRepository userRepository) {
-        return userRepository.findById(userId).orElseThrow(
-                () -> new EntityNotFoundException("User with id: " + userId + " not found")
-        );
+    User toModel(UserResponseDto userResponseDto);
+
+    @Named("fromUserResponseDtosToUsers")
+    default Set<User> usersSet(
+            Set<UserResponseDto> userDtos) {
+        if (userDtos == null || userDtos.isEmpty()) {
+            return new HashSet<>();
+        }
+        return userDtos
+                .stream()
+                .map(this::toModel)
+                .collect(Collectors.toSet());
     }
 
+    @Named("fromUsersToUserResponseDtos")
+    default Set<UserResponseDto> cartItemDtosSet(Set<User> users) {
+        if (users == null || users.isEmpty()) {
+            return new HashSet<>();
+        }
+        return users
+                .stream()
+                .map(this::toDto)
+                .collect(Collectors.toSet());
+    }
 }

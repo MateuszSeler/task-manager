@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import lombok.Data;
 import lombok.experimental.Accessors;
@@ -25,20 +26,21 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(unique = true, nullable = false)
+    @NotNull
+    @Column(unique = true)
     private String email;
-    @Column(nullable = false)
+    @NotNull
     private String password;
-    @Column(nullable = false)
+    @NotNull
     private String firstName;
-    @Column(nullable = false)
+    @NotNull
     private String lastName;
-    @Column(nullable = false)
+    @NotNull
     private boolean isDeleted = false;
 
     @Override
     public Set<? extends GrantedAuthority> getAuthorities() {
-        return Set.of(new SimpleGrantedAuthority("USER"));
+        return Set.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
 
     @Override

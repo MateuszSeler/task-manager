@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-project_managers-table
+      author: mseler
+      changes:
+        - createTable:
+            tableName: project_managers
+            columns:
+              - column:
+                  name: project_id
+                  type: bigint
+
+              - column:
+                  name: user_id
+                  type: bigint

@@ -7,7 +7,7 @@ import app.dto.user.UserRegistrationRequestDto;
 import app.exception.EntityNotFoundException;
 import app.exception.RegistrationException;
 import app.model.User;
-import app.repository.user.UserRepository;
+import app.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,7 +71,7 @@ class UserServiceImplTest {
     }
 
     @Test
-    void findByEmail_NotExistingUser_entityNotFoundException() {
+    void getByEmail_NotExistingUser_entityNotFoundException() {
         String email = "nonExistingUser@gmail.com";
 
         Mockito.when(userRepository.findByEmail(email))
@@ -79,7 +79,7 @@ class UserServiceImplTest {
 
         EntityNotFoundException exception =
                 assertThrows(EntityNotFoundException.class,
-                        () -> userService.findByEmail(email));
+                        () -> userService.getByEmail(email));
 
         assertEquals("User with email: " + email
                 + " not found", exception.getMessage());
