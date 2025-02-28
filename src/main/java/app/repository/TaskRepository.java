@@ -13,5 +13,13 @@ public interface TaskRepository extends JpaRepository<Task, Long> {
             + "FROM tasks "
             + "WHERE tasks.project_id = :projectId",
             nativeQuery = true)
-    Set<Task> getTasksFromProject(@NotNull Long projectId);
+    Set<Task> getTasksFromProjectWithNoUserNoProjectNoLabels(@NotNull Long projectId);
+
+    @Query(value = "SELECT * "
+            + "FROM tasks "
+            + "JOIN tasks_labels "
+            + "ON id = tasks_labels.task_id "
+            + "WHERE tasks_labels.label_id = :labelId ",
+            nativeQuery = true)
+    Set<Task> findTasksMarkedByLabel(Long labelId);
 }

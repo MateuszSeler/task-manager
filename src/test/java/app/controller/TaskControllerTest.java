@@ -135,7 +135,7 @@ class TaskControllerTest {
         Long taskId = 1L;
 
         MvcResult mvcResult = mockMvc.perform(
-                        get("/projects/" + projectId + "/tasks/" + taskId)
+                        get("/projects/{projectId}/tasks/{taskId}", projectId, taskId)
                                 .header("Authorization", "Bearer " + loginUser().token())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -150,14 +150,14 @@ class TaskControllerTest {
     }
 
     @Test
-    void updateTaskById() throws Exception {
+    void updateTaskById_validatedRequestDto_byProjectManager_success() throws Exception {
         Long projectId = 2L;
         Long taskId = 1L;
         TaskUpdateRequestDto requestDto = getTaskUpdateRequestDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         MvcResult mvcResult = mockMvc.perform(
-                        put("/projects/" + projectId + "/tasks/" + taskId)
+                        put("/projects/{projectId}/tasks/{taskId}", projectId, taskId)
                                 .header("Authorization", "Bearer " + loginUser().token())
                                 .content(jsonRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
@@ -173,12 +173,44 @@ class TaskControllerTest {
     }
 
     @Test
-    void deleteTaskById() throws Exception {
+    void deleteTaskById_success() throws Exception {
         Long projectId = 2L;
         Long taskId = 1L;
 
         MvcResult mvcResult = mockMvc.perform(
-                        delete("/projects/" + projectId + "/tasks/" + taskId)
+                        delete("/projects/{projectId}/tasks/{taskId}", projectId, taskId)
+                                .header("Authorization", "Bearer " + loginUser().token())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isNoContent())
+                .andReturn();
+    }
+
+    @Test
+    void addLabelToTask() throws Exception {
+        Long projectId = 1L;
+        Long taskId = 1L;
+        Long labelId = 1L;
+
+        MvcResult mvcResult = mockMvc.perform(
+                        post("/projects/{projectId}/tasks/{taskId}/labels/{labelId}",
+                                projectId, taskId, labelId)
+                                .header("Authorization", "Bearer " + loginUser().token())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isCreated())
+                .andReturn();
+    }
+
+    @Test
+    void removeLabelFromTask() throws Exception {
+        Long projectId = 1L;
+        Long taskId = 2L;
+        Long labelId = 1L;
+
+        MvcResult mvcResult = mockMvc.perform(
+                        delete("/projects/{projectId}/tasks/{taskId}/labels/{labelId}",
+                                projectId, taskId, labelId)
                                 .header("Authorization", "Bearer " + loginUser().token())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )

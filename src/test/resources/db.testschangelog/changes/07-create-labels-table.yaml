@@ -1,10 +1,10 @@
 databaseChangeLog:
   - changeSet:
-      id: create-comments-table
+      id: create-labels-table
       author: mseler
       changes:
         - createTable:
-            tableName: comments
+            tableName: labels
             columns:
               - column:
                   name: id
@@ -19,18 +19,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: text
-                  type: varchar(2000)
-              - column:
-                  name: timestamp
-                  type: datetime
-              - column:
-                  name: task_id
-                  type: bigint
+                  name: color
+                  type: ENUM ('BLUE', 'CHARTREUSE', 'RED', 'CRIMSON', 'CYAN', 'LIME', 'GREEN')
                   constraints:
                     nullable: false
               - column:
-                  name: user_id
+                  name: project_id
                   type: bigint
                   constraints:
                     nullable: false

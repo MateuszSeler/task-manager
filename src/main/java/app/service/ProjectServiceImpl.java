@@ -48,12 +48,12 @@ public class ProjectServiceImpl implements ProjectService {
     public Set<ProjectDto> getUsersProjects(@NotNull Long userId) {
         getUserByIdOrThrowEntityNotFoundException(userId);
 
-        if (projectRepository.findUsersProjects(userId) == null
-                || projectRepository.findUsersProjects(userId).isEmpty()) {
+        if (projectRepository.findUsersProjectsWithNoMembersNoManagers(userId) == null
+                || projectRepository.findUsersProjectsWithNoMembersNoManagers(userId).isEmpty()) {
             return new HashSet<>();
         }
 
-        return projectRepository.findUsersProjects(userId)
+        return projectRepository.findUsersProjectsWithNoMembersNoManagers(userId)
                 .stream()
                 .map(projectMapper::toDto)
                 .collect(Collectors.toSet());
@@ -79,7 +79,8 @@ public class ProjectServiceImpl implements ProjectService {
     public void deleteById(@NotNull Long projectId) {
         getProjectByIdOrThrowEntityNotFoundException(projectId);
 
-        Set<Task> tasksFromProject = taskRepository.getTasksFromProject(projectId);
+        Set<Task> tasksFromProject = taskRepository
+                .getTasksFromProjectWithNoUserNoProjectNoLabels(projectId);
         for (Task task : tasksFromProject) {
             taskRepository.deleteById(task.getId());
         }
@@ -90,11 +91,6 @@ public class ProjectServiceImpl implements ProjectService {
     private User getUserByIdOrThrowEntityNotFoundException(@NotNull Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + userId + " not found"));
-    }
-
-    private User getUserByEmailOrThrowEntityNotFoundException(@NotNull String userEmail) {
-        return userRepository.findByEmail(userEmail).orElseThrow(
-                () -> new EntityNotFoundException("User with id: " + userEmail + " not found"));
     }
 
     private Project getProjectByIdOrThrowEntityNotFoundException(@NotNull Long projectId) {

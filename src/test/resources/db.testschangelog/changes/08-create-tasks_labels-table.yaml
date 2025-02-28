@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tasks_labels-table
+      author: mseler
+      changes:
+        - createTable:
+            tableName: tasks_labels
+            columns:
+              - column:
+                  name: label_id
+                  type: bigint
+
+              - column:
+                  name: task_id
+                  type: bigint

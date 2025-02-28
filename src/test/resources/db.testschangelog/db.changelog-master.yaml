@@ -1,13 +1,17 @@
 databaseChangeLog:
   - include:
-      file: db.testschangelog/changes/01-create-users-table.yaml
+      file: db.changelog/changes/01-create-users-table.yaml
   - include:
-      file: db.changelog/changes/03-create-projects-table.yaml
+      file: db.changelog/changes/02-create-projects-table.yaml
   - include:
-      file: db.changelog/changes/04-create-tasks-table.yaml
+      file: db.changelog/changes/03-create-tasks-table.yaml
   - include:
-      file: db.changelog/changes/05-create-comments-table.yaml
+      file: db.changelog/changes/04-create-project_members-table.yaml
   - include:
-      file: db.changelog/changes/06-create-project_members-table.yaml
+      file: db.changelog/changes/05-create-project_managers-table.yaml
   - include:
-      file: db.changelog/changes/07-create-project_managers-table.yaml
+      file: db.changelog/changes/06-create-comments-table.yaml
+  - include:
+      file: db.changelog/changes/07-create-labels-table.yaml
+  - include:
+      file: db.changelog/changes/08-create-tasks_labels-table.yaml

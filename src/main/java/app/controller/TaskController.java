@@ -54,8 +54,8 @@ public class TaskController {
     @PreAuthorize("hasRole('ROLE_USER') "
             + "and @memberService.whetherUserIsMember(#projectId, authentication.name)")
     @GetMapping("/{projectId}/tasks/{taskId}")
-    @Operation(summary = "getting tasks",
-            description = "getting tasks from the project")
+    @Operation(summary = "getting task",
+            description = "getting task by id")
     public TaskDto getTaskById(
             @PathVariable @Valid Long projectId,
             @PathVariable @Valid Long taskId) {
@@ -84,5 +84,31 @@ public class TaskController {
             @PathVariable @Valid Long projectId,
             @PathVariable @Valid Long taskId) {
         taskService.deleteById(taskId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER') "
+            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PostMapping("/{projectId}/tasks/{taskId}/labels/{labelId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "adding label",
+            description = "adding new label to the task")
+    public TaskDto addLabelToTask(
+            @PathVariable @Valid Long projectId,
+            @PathVariable @Valid Long taskId,
+            @PathVariable @Valid Long labelId) {
+        return taskService.addLabelToTask(taskId, labelId);
+    }
+
+    @PreAuthorize("hasRole('ROLE_USER') "
+            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @DeleteMapping("/{projectId}/tasks/{taskId}/labels/{labelId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @Operation(summary = "deleting label",
+            description = "deleting label from the task")
+    public void removeLabelFromTask(
+            @PathVariable @Valid Long projectId,
+            @PathVariable @Valid Long taskId,
+            @PathVariable @Valid Long labelId) {
+        taskService.removeLabelFromTask(taskId, labelId);
     }
 }

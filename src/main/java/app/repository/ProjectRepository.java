@@ -15,7 +15,7 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             + "ON id = project_members.project_id "
             + "WHERE project_members.user_id = :userId",
             nativeQuery = true)
-    Set<Project> findUsersProjects(Long userId);
+    Set<Project> findUsersProjectsWithNoMembersNoManagers(Long userId);
 
     @Query(value = "SELECT * "
             + "FROM projects "
@@ -24,7 +24,8 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             + "WHERE project_members.user_id = :userId "
             + "AND project_members.project_id = :projectId",
             nativeQuery = true)
-    Optional<Project> findProjectByUserIdAndProjectId(Long userId, Long projectId);
+    Optional<Project> findProjectByUserIdAndProjectIdWithNoMembersNoManagers(
+            Long userId, Long projectId);
 
     @Query(value = "SELECT * "
             + "FROM projects "
@@ -33,5 +34,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             + "WHERE project_managers.user_id = :userId "
             + "AND project_managers.project_id = :projectId",
             nativeQuery = true)
-    Optional<Project> findManagingProjectByUserIdAndProjectId(Long userId, Long projectId);
+    Optional<Project> findManagingProjectByUserIdAndProjectIdWithNoMembersNoManagers(
+            Long userId, Long projectId);
 }

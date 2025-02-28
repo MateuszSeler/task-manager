@@ -27,7 +27,7 @@ public class MemberServiceImpl implements MemberService {
     public boolean whetherUserIsMember(@NotNull Long projectId, @NotNull String userEmail) {
         User owner = getUserByEmailOrThrowEntityNotFoundException(userEmail);
         return projectRepository
-                .findProjectByUserIdAndProjectId(owner.getId(), projectId)
+                .findProjectByUserIdAndProjectIdWithNoMembersNoManagers(owner.getId(), projectId)
                 .isPresent();
     }
 
@@ -35,7 +35,8 @@ public class MemberServiceImpl implements MemberService {
     public boolean isUserManagingTheProject(@NotNull Long projectId, @NotNull String userEmail) {
         User owner = getUserByEmailOrThrowEntityNotFoundException(userEmail);
         return projectRepository
-                .findManagingProjectByUserIdAndProjectId(owner.getId(), projectId)
+                .findManagingProjectByUserIdAndProjectIdWithNoMembersNoManagers(
+                        owner.getId(), projectId)
                 .isPresent();
     }
 

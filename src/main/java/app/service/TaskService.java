@@ -18,4 +18,8 @@ public interface TaskService {
     TaskDto updateTaskById(@NotNull Long taskId, @Valid TaskUpdateRequestDto requestDto);
 
     void deleteById(@Valid Long taskId);
+
+    TaskDto addLabelToTask(@Valid Long taskId, @Valid Long labelId);
+
+    void removeLabelFromTask(@Valid Long taskId, @Valid Long labelId);
 }
