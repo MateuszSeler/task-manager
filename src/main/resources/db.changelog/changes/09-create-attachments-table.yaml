@@ -1,0 +1,43 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-attachments-table
+      author: mseler
+      changes:
+        - createTable:
+            tableName: attachments
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: file_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: task_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_id
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_url
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_path
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: upload_date
+                  type: datetime

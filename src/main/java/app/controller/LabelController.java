@@ -66,8 +66,8 @@ public class LabelController {
     @PreAuthorize("hasRole('ROLE_USER') "
             + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @DeleteMapping("/{projectId}/labels/{labelId}")
-    @Operation(summary = "getting labels",
-            description = "getting labels attached to the task")
+    @Operation(summary = "deleting labels",
+            description = "deleting labels attached to the task")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteLabelById(
             @PathVariable @Valid Long projectId,

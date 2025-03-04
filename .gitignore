@@ -34,3 +34,5 @@ build/
 
 *.env
 *.properties
+
+google-drive-credentials.json
