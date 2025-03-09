@@ -26,8 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class AttachmentController {
     private final AttachmentService attachmentService;
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.whetherUserIsMember(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
     @PostMapping("/{projectId}/tasks/{taskId}/attachments/")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "upload attachment",
@@ -39,8 +38,7 @@ public class AttachmentController {
         return attachmentService.uploadFile(taskId, file);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
     @GetMapping("/{projectId}/tasks/{taskId}/attachments/{fileId}")
     @Operation(summary = "download attachment",
             description = "downloading attachment attachment by id")
@@ -51,8 +49,7 @@ public class AttachmentController {
         return attachmentService.downloadFile(fileId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @DeleteMapping("/{projectId}/tasks/{taskId}/attachments/{fileId}")
     @Operation(summary = "deleting attachment",
             description = "deleting attachment from the task")

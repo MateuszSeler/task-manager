@@ -7,31 +7,26 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import lombok.experimental.Accessors;
+import org.springframework.security.core.GrantedAuthority;
 
 @Entity
 @Data
-@Accessors(chain = true)
-@Table(name = "labels")
-public class Label {
+@Table(name = "roles")
+public class Role implements GrantedAuthority {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
-    private String name;
-    @NotNull
     @Enumerated(EnumType.STRING)
-    private Color color;
+    private RoleName roleType;
 
-    public enum Color {
-        BLUE,
-        CHARTREUSE,
-        RED,
-        CRIMSON,
-        CYAN,
-        LIME,
-        GREEN;
+    public enum RoleName {
+        ROLE_ADMIN,
+        ROLE_USER;
+    }
+
+    @Override
+    public String getAuthority() {
+        return roleType.toString();
     }
 }

@@ -45,7 +45,7 @@ public class ProjectController {
 
     @PreAuthorize("hasRole('ROLE_USER')")
     @GetMapping
-    @Operation(summary = "getting projects",
+    @Operation(summary = "getting user's projects",
             description = "getting all of user's projects")
     public Set<ProjectDto> getUsersProjects() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -53,8 +53,8 @@ public class ProjectController {
                 userService.getByEmail(authentication.getName()).getId());
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.whetherUserIsMember(#projectId, authentication.name)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') "
+            + "or @memberService.whetherUserIsMember(#projectId, authentication.name)")
     @GetMapping("/{projectId}")
     @Operation(summary = "getting project",
             description = "getting project by id")
@@ -62,19 +62,18 @@ public class ProjectController {
         return projectService.getProjectById(projectId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @PutMapping("/{projectId}")
-    @Operation(summary = "getting projects",
-            description = "getting all of user's projects")
+    @Operation(summary = "updating project",
+            description = "updating project")
     public ProjectDto updateProjectById(
             @PathVariable @Valid Long projectId,
             @RequestBody @Valid ProjectCreateRequestDto requestDto) {
         return projectService.updateProjectById(projectId, requestDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("hasRole('ROLE_ADMIN') "
+            + "or @memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @DeleteMapping("/{projectId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "deleting projects",

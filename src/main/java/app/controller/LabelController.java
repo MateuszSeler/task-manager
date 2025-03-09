@@ -25,52 +25,53 @@ import org.springframework.web.bind.annotation.RestController;
         description = "Endpoints for managing task's labels in the projects")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/projects")
+@RequestMapping("/labels")
 public class LabelController {
     private final LabelService labelService;
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.whetherUserIsMember(#projectId, authentication.name)")
-    @PostMapping("/{projectId}/labels/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "creating label",
-            description = "creating new label in the project")
+            description = "creating new label")
     public LabelDto createLabel(
-            @PathVariable @Valid Long projectId,
             @RequestBody @Valid LabelCreateRequestDto requestDto) {
-        return labelService.createLabel(projectId, requestDto);
+        return labelService.createLabel(requestDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
-    @GetMapping("/{projectId}/labels/")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping
+    @Operation(summary = "getting labels",
+            description = "getting all labels")
+    public Set<LabelDto> getLabels() {
+        return labelService.getLabels();
+    }
+
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @GetMapping("/{labelId}")
     @Operation(summary = "getting labels",
             description = "getting labels from the project")
-    public Set<LabelDto> getLabelsFromProject(
-            @PathVariable @Valid Long projectId) {
-        return labelService.getLabelsFromProject(projectId);
+    public LabelDto getLabelById(
+            @PathVariable @Valid Long labelId) {
+        return labelService.getLabelById(labelId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
-    @PutMapping("/{projectId}/labels/{labelId}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PutMapping("/{labelId}")
     @Operation(summary = "updating label",
             description = "updating label by id")
     public LabelDto updateLabel(
-            @PathVariable @Valid Long projectId,
             @PathVariable @Valid Long labelId,
             @RequestBody @Valid LabelUpdateRequestDto requestDto) {
         return labelService.updateLabel(labelId, requestDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
-    @DeleteMapping("/{projectId}/labels/{labelId}")
-    @Operation(summary = "deleting labels",
-            description = "deleting labels attached to the task")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @DeleteMapping("/{labelId}")
+    @Operation(summary = "deleting label",
+            description = "deleting label by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteLabelById(
-            @PathVariable @Valid Long projectId,
             @PathVariable @Valid Long labelId) {
         labelService.deleteLabelById(labelId);
     }

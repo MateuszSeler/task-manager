@@ -8,12 +8,15 @@ import java.util.Set;
 
 public interface LabelService {
 
-    LabelDto createLabel(@Valid Long projectId, @Valid LabelCreateRequestDto requestDto);
+    LabelDto createLabel(@Valid LabelCreateRequestDto requestDto);
 
-    Set<LabelDto> getLabelsFromProject(@Valid Long projectId);
+    Set<LabelDto> getLabelsFromProject();
 
     LabelDto updateLabel(@Valid Long labelId, @Valid LabelUpdateRequestDto requestDto);
 
     void deleteLabelById(@Valid Long labelId);
 
+    LabelDto getLabelById(@Valid Long labelId);
+
+    Set<LabelDto> getLabels();
 }

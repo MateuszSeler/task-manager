@@ -8,14 +8,17 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 @Mapper(config = MapperConfig.class)
 public interface UserMapper {
     UserResponseDto toDto(User user);
 
+    @Mapping(target = "roles", ignore = true)
     User toModel(UserRegistrationRequestDto registrationRequestDto);
 
+    @Mapping(target = "roles", ignore = true)
     User toModel(UserResponseDto userResponseDto);
 
     @Named("fromUserResponseDtosToUsers")

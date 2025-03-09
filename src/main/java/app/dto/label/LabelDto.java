@@ -1,7 +1,6 @@
 package app.dto.label;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -13,6 +12,4 @@ public class LabelDto {
     private String name;
     @NotBlank
     private String color;
-    @NotNull
-    private Long projectId;
 }

@@ -9,4 +9,8 @@ public interface CommentService {
     CommentDto createComment(@Valid CommentCreateRequestDto requestDto);
 
     Set<CommentDto> getCommentsFromTask(@Valid Long taskId);
+
+    void deleteCommentById(@Valid Long commentId);
+
+    CommentDto updateCommentById(@Valid Long commentId, @Valid CommentCreateRequestDto requestDto);
 }

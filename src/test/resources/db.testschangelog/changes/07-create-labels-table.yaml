@@ -23,8 +23,3 @@ databaseChangeLog:
                   type: ENUM ('BLUE', 'CHARTREUSE', 'RED', 'CRIMSON', 'CYAN', 'LIME', 'GREEN')
                   constraints:
                     nullable: false
-              - column:
-                  name: project_id
-                  type: bigint
-                  constraints:
-                    nullable: false

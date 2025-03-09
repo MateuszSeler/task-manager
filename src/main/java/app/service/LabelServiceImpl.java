@@ -26,13 +26,15 @@ public class LabelServiceImpl implements LabelService {
     private final TaskRepository taskRepository;
 
     @Override
-    public LabelDto createLabel(Long projectId, LabelCreateRequestDto requestDto) {
-        return labelMapper.toDto(labelRepository.save(toEntity(requestDto)));
+    public LabelDto createLabel(LabelCreateRequestDto requestDto) {
+        return labelMapper.toDto(
+                labelRepository.save(
+                        labelMapper.toModel(requestDto)));
     }
 
     @Override
-    public Set<LabelDto> getLabelsFromProject(Long projectId) {
-        return labelRepository.findLabelsFromTheProject(projectId)
+    public Set<LabelDto> getLabelsFromProject() {
+        return labelRepository.findAll()
                 .stream()
                 .map(labelMapper::toDto)
                 .collect(Collectors.toSet());
@@ -59,9 +61,17 @@ public class LabelServiceImpl implements LabelService {
         labelRepository.deleteById(labelId);
     }
 
-    private Label toEntity(LabelCreateRequestDto requestDto) {
-        Project project = getProjectByIdOrThrowEntityNotFoundException(requestDto.getProjectId());
-        return labelMapper.toModel(requestDto).setProject(project);
+    @Override
+    public LabelDto getLabelById(Long labelId) {
+        return labelMapper.toDto(getLabelByIdOrThrowEntityNotFoundException(labelId));
+    }
+
+    @Override
+    public Set<LabelDto> getLabels() {
+        return labelRepository.getAll()
+                .stream()
+                .map(labelMapper::toDto)
+                .collect(Collectors.toSet());
     }
 
     private Project getProjectByIdOrThrowEntityNotFoundException(@NotNull Long projectId) {

@@ -16,15 +16,24 @@ import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
 @Service
+@Component("commentService")
 public class CommentServiceImpl implements CommentService {
     private final CommentRepository commentRepository;
     private final CommentMapper commentMapper;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+
+    public boolean isUserIsTheAuthor(Long commentId, String userEmail) {
+        User author = getUserByEmailOrThrowEntityNotFoundException(userEmail);
+        return commentRepository
+                .findCommentByUserIdAndCommentId(author.getId(), commentId)
+                .isPresent();
+    }
 
     @Override
     public CommentDto createComment(
@@ -41,6 +50,19 @@ public class CommentServiceImpl implements CommentService {
                 .collect(Collectors.toSet());
     }
 
+    @Override
+    public void deleteCommentById(Long commentId) {
+        getCommentByIdOrThrowEntityNotFoundException(commentId);
+        commentRepository.deleteById(commentId);
+    }
+
+    @Override
+    public CommentDto updateCommentById(Long commentId, CommentCreateRequestDto requestDto) {
+        Comment updatedComment = getCommentByIdOrThrowEntityNotFoundException(commentId)
+                .setText(requestDto.getText());
+        return commentMapper.toDto(commentRepository.save(updatedComment));
+    }
+
     private Comment toEntity(@Valid CommentCreateRequestDto requestDto) {
         User owner = getUserByIdOrThrowEntityNotFoundException(requestDto.getUserId());
         Task task = getTaskByIdOrThrowEntityNotFoundException(requestDto.getTaskId());
@@ -50,9 +72,19 @@ public class CommentServiceImpl implements CommentService {
                 .setTask(task);
     }
 
+    private Comment getCommentByIdOrThrowEntityNotFoundException(@NotNull Long commentId) {
+        return commentRepository.findById(commentId).orElseThrow(
+                () -> new EntityNotFoundException("Comment with id: " + commentId + " not found"));
+    }
+
     private User getUserByIdOrThrowEntityNotFoundException(@NotNull Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + userId + " not found"));
+    }
+
+    private User getUserByEmailOrThrowEntityNotFoundException(@NotNull String userEmail) {
+        return userRepository.findByEmail(userEmail).orElseThrow(
+                () -> new EntityNotFoundException("User with id: " + userEmail + " not found"));
     }
 
     private Task getTaskByIdOrThrowEntityNotFoundException(@NotNull Long taskId) {

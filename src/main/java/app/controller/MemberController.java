@@ -22,8 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class MemberController {
     private final MemberService memberService;
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @PostMapping("/{projectId}/members/{userId}")
     @Operation(summary = "adding member",
             description = "adding user to the project")
@@ -33,8 +32,7 @@ public class MemberController {
         return memberService.addUserToProject(projectId, userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @DeleteMapping("/{projectId}/members/{userId}")
     @Operation(summary = "deleting member",
             description = "removing user from the project")
@@ -44,8 +42,7 @@ public class MemberController {
         return memberService.deleteUserFromProject(projectId, userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @PostMapping("/{projectId}/members/{userId}/managers")
     @Operation(summary = "changing user role",
             description = "changing user role in the project")
@@ -55,8 +52,7 @@ public class MemberController {
         return memberService.makeUserManagerOfTheProject(projectId, userId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @DeleteMapping("/{projectId}/members/{userId}/managers")
     @Operation(summary = "changing user role",
             description = "changing user role in the project")

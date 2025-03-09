@@ -5,6 +5,12 @@ VALUES (1, 'jan@gmail.com', '$2a$10$TVPKgP9EZZstDAmcxzrhnukVlvnolcVGMfZMlzh1ilSL
 INSERT INTO users (id, email, password, first_name, last_name, is_deleted)
 VALUES (2, 'piotr@gmail.com', '$2a$10$bHUPuNHbuvggx5j1x128x.s9LP/WLzyuCiwduvNIuzMbq6JlmJVzS', 'Piotr', 'Piotr', 0);
 
+INSERT INTO users_roles (user_id, role_id)
+VALUES (1, 2);
+
+INSERT INTO users_roles (user_id, role_id)
+VALUES (2, 2);
+
 --JAN'S PROJECT WITH TWO TASKS AND ONE COMMENT AND PIOTR AS A MEMBER
 INSERT INTO projects (id, name, description, start_date, end_date, status)
 VALUES (1, 'new project', 'description of Jan new project', '2025-02-26', '2025-04-26', 'IN_PROGRESS');

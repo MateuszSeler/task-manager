@@ -13,8 +13,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import app.dto.label.LabelCreateRequestDto;
 import app.dto.label.LabelDto;
 import app.dto.label.LabelUpdateRequestDto;
-import app.dto.user.UserLoginRequestDto;
-import app.dto.user.UserLoginResponseDto;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.Set;
@@ -24,6 +22,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -51,14 +50,13 @@ class LabelControllerTest {
     }
 
     @Test
-    void createLabel_validatedRequestDto_byProjectManager_success() throws Exception {
-        Long projectId = 1L;
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void createLabel_validatedRequestDto_success() throws Exception {
         LabelCreateRequestDto requestDto = getLabelCreateRequestDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         MvcResult mvcResult = mockMvc.perform(
-                        post("/projects/{projectId}/labels/", projectId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                        post("/labels")
                                 .content(jsonRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -74,12 +72,10 @@ class LabelControllerTest {
     }
 
     @Test
-    void getLabelsFromProject_existingProject_setOfOne() throws Exception {
-        Long projectId = 1L;
-
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void getLabels_setOfOne() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
-                        get("/projects/{projectId}/labels/", projectId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                        get("/labels")
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -96,15 +92,14 @@ class LabelControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void updateLabels_validatedRequestDto_byProjectManager_success() throws Exception {
-        Long projectId = 1L;
         Long labelId = 1L;
         LabelUpdateRequestDto requestDto = getLabelUpdateRequestDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         MvcResult mvcResult = mockMvc.perform(
-                        put("/projects/{projectId}/labels/{labelId}", projectId, labelId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                        put("/labels/{labelId}", labelId)
                                 .content(jsonRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -119,50 +114,54 @@ class LabelControllerTest {
     }
 
     @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
     void deleteLabelById_success() throws Exception {
-        Long projectId = 1L;
         Long labelId = 1L;
 
         MvcResult mvcResult = mockMvc.perform(
-                        delete("/projects/{projectId}/labels/{labelId}", projectId, labelId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                        delete("/labels/{labelId}", labelId)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNoContent())
                 .andReturn();
     }
 
-    private UserLoginResponseDto loginUser() throws Exception {
-        UserLoginRequestDto userLoginRequestDto = new UserLoginRequestDto()
-                .setEmail("jan@gmail.com")
-                .setPassword("haslojana");
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void getLabelById() throws Exception {
+        Long labelId = 1L;
 
-        String jsonRequest = objectMapper.writeValueAsString(userLoginRequestDto);
-
-        MvcResult mvcLoginResult = mockMvc.perform(
-                        post("/authentication/login")
-                                .content(jsonRequest)
+        MvcResult mvcResult = mockMvc.perform(
+                        get("/labels/{labelId}", labelId)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
 
-        return objectMapper.readValue(
-                mvcLoginResult.getResponse().getContentAsString(), UserLoginResponseDto.class);
+        LabelDto actual = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), LabelDto.class);
+
+        assertNotNull(actual);
+        EqualsBuilder.reflectionEquals(getExpectedLabelDtoFromDb(), actual);
+    }
+
+    private LabelDto getExpectedLabelDtoFromDb() {
+        return new LabelDto()
+                .setId(1L)
+                .setName("Milestone")
+                .setColor("LIME");
     }
 
     private LabelCreateRequestDto getLabelCreateRequestDto() {
         return new LabelCreateRequestDto()
                 .setName("new label")
-                .setColor("BLUE")
-                .setProjectId(1L);
+                .setColor("BLUE");
     }
 
     private LabelDto getLabelDtoSavedByTestMethode() {
         return new LabelDto()
                 .setName("new label")
-                .setColor("BLUE")
-                .setProjectId(1L);
+                .setColor("BLUE");
     }
 
     private LabelUpdateRequestDto getLabelUpdateRequestDto() {

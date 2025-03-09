@@ -30,8 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
     private final TaskService taskService;
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @PostMapping("/{projectId}/tasks")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "creating task",
@@ -42,8 +41,7 @@ public class TaskController {
         return taskService.createTask(projectId, taskCreateRequestDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.whetherUserIsMember(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
     @GetMapping("/{projectId}/tasks")
     @Operation(summary = "getting tasks",
             description = "getting tasks from the project")
@@ -51,8 +49,7 @@ public class TaskController {
         return taskService.getTasksFromProject(projectId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.whetherUserIsMember(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
     @GetMapping("/{projectId}/tasks/{taskId}")
     @Operation(summary = "getting task",
             description = "getting task by id")
@@ -62,8 +59,7 @@ public class TaskController {
         return taskService.getTaskById(taskId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @PutMapping("/{projectId}/tasks/{taskId}")
     @Operation(summary = "updating tasks",
             description = "updating tasks from the project")
@@ -74,8 +70,7 @@ public class TaskController {
         return taskService.updateTaskById(taskId, requestDto);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize("@memberService.isUserManagingTheProject(#projectId, authentication.name)")
     @DeleteMapping("/{projectId}/tasks/{taskId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "deleting tasks",
@@ -86,8 +81,9 @@ public class TaskController {
         taskService.deleteById(taskId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize(
+            "@memberService.isUserManagingTheProject(#projectId, authentication.name)"
+                    + " or @taskService.hasUserBeenAssigneeOfTask")
     @PostMapping("/{projectId}/tasks/{taskId}/labels/{labelId}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "adding label",
@@ -99,8 +95,9 @@ public class TaskController {
         return taskService.addLabelToTask(taskId, labelId);
     }
 
-    @PreAuthorize("hasRole('ROLE_USER') "
-            + "and @memberService.isUserManagingTheProject(#projectId, authentication.name)")
+    @PreAuthorize(
+            "@memberService.isUserManagingTheProject(#projectId, authentication.name)"
+                    + " or @taskService.hasUserBeenAssigneeOfTask")
     @DeleteMapping("/{projectId}/tasks/{taskId}/labels/{labelId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "deleting label",

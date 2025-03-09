@@ -1,8 +1,6 @@
 package app.controller;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -10,19 +8,18 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import app.dto.comment.CommentCreateRequestDto;
-import app.dto.comment.CommentDto;
 import app.dto.user.UserLoginRequestDto;
 import app.dto.user.UserLoginResponseDto;
-import com.fasterxml.jackson.core.type.TypeReference;
+import app.dto.user.UserRegistrationRequestDto;
+import app.dto.user.UserResponseDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Set;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -31,11 +28,11 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Sql(scripts = "classpath:sqlqueries/comments-before-method-query-set.sql",
+@Sql(scripts = "classpath:sqlqueries/users-before-method-query-set.sql",
         executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-@Sql(scripts = "classpath:sqlqueries/comments-after-method-query-set.sql",
+@Sql(scripts = "classpath:sqlqueries/users-after-method-query-set.sql",
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-class CommentControllerTest {
+class UserControllerTest {
     protected static MockMvc mockMvc;
 
     @Autowired
@@ -50,92 +47,73 @@ class CommentControllerTest {
     }
 
     @Test
-    void createComment() throws Exception {
-        Long projectId = 1L;
-        Long taskId = 1L;
-        CommentCreateRequestDto requestDto = getCommentCreateRequestDto();
-        String jsonRequest = objectMapper.writeValueAsString(requestDto);
-
+    void getProfile_byOwner_userDto() throws Exception {
         MvcResult mvcResult = mockMvc.perform(
-                        post("/projects/{projectId}/tasks/{taskId}/comments/", projectId, taskId)
-                                .header("Authorization", "Bearer " + loginUser().token())
-                                .content(jsonRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isCreated())
-                .andReturn();
-
-        CommentDto actual = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(), CommentDto.class);
-
-        assertNotNull(actual);
-        assertNotNull(actual.getId());
-        EqualsBuilder.reflectionEquals(
-                getCommentDtoSavedByTestMethode(), actual, "id", "timestamp");
-    }
-
-    @Test
-    void getCommentsFromTask() throws Exception {
-        Long projectId = 1L;
-        Long taskId = 1L;
-
-        MvcResult mvcResult = mockMvc.perform(
-                        get("/projects/{projectId}/tasks/{taskId}/comments/", projectId, taskId)
+                        get("/users/me")
                                 .header("Authorization", "Bearer " + loginUser().token())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
                 .andReturn();
 
-        Set<CommentDto> actual = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(),
-                new TypeReference<Set<CommentDto>>() {}
-        );
+        UserResponseDto actual = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), UserResponseDto.class);
 
-        Assertions.assertNotNull(actual);
-        assertFalse(actual.isEmpty());
-        assertTrue(actual.size() == 1);
+        assertNotNull(actual);
+        EqualsBuilder.reflectionEquals(getExpectedUserDtoFromDb(), actual);
     }
 
     @Test
-    void deleteCommentById() throws Exception {
-        Long projectId = 1L;
-        Long taskId = 1L;
-        Long commentId = 1L;
+    void updateUserProfile() throws Exception {
+        UserRegistrationRequestDto requestDto = getUserRegistrationRequestDto();
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
         MvcResult mvcResult = mockMvc.perform(
-                        delete("/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
-                                projectId, taskId, commentId)
+                        put("/users/me")
                                 .header("Authorization", "Bearer " + loginUser().token())
+                                .content(jsonRequest)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserResponseDto actual = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), UserResponseDto.class);
+
+        Assertions.assertNotNull(actual);
+        EqualsBuilder.reflectionEquals(getUserDtoSavedByTestMethode(), actual);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void getUserById() throws Exception {
+        Long userId = 1L;
+
+        MvcResult mvcResult = mockMvc.perform(
+                        get("/users/{userId}", userId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        UserResponseDto actual = objectMapper.readValue(
+                mvcResult.getResponse().getContentAsString(), UserResponseDto.class);
+
+        assertNotNull(actual);
+        EqualsBuilder.reflectionEquals(getExpectedUserDtoFromDb(), actual);
+    }
+
+    @Test
+    @WithMockUser(username = "admin", roles = "ADMIN")
+    void deletingUserById() throws Exception {
+        Long userId = 1L;
+
+        MvcResult mvcResult = mockMvc.perform(
+                        delete("/users/{userId}", userId)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNoContent())
                 .andReturn();
-    }
-
-    @Test
-    void updateCommentById() throws Exception {
-        Long projectId = 1L;
-        Long taskId = 1L;
-        Long commentId = 1L;
-        CommentCreateRequestDto requestDto = getCommentCreateRequestDto();
-        String jsonRequest = objectMapper.writeValueAsString(requestDto);
-
-        MvcResult mvcResult = mockMvc.perform(
-                        put("/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
-                                projectId, taskId, commentId)
-                                .header("Authorization", "Bearer " + loginUser().token())
-                                .content(jsonRequest)
-                                .contentType(MediaType.APPLICATION_JSON)
-                )
-                .andExpect(status().isOk())
-                .andReturn();
-
-        CommentDto actual = objectMapper.readValue(
-                mvcResult.getResponse().getContentAsString(), CommentDto.class);
-
-        Assertions.assertNotNull(actual);
-        EqualsBuilder.reflectionEquals(getCommentDtoSavedByTestMethode(), actual);
     }
 
     private UserLoginResponseDto loginUser() throws Exception {
@@ -157,18 +135,28 @@ class CommentControllerTest {
                 mvcLoginResult.getResponse().getContentAsString(), UserLoginResponseDto.class);
     }
 
-    private CommentCreateRequestDto getCommentCreateRequestDto() {
-        return new CommentCreateRequestDto()
-                .setText("new comment")
-                .setUserId(1L)
-                .setTaskId(1L);
-
+    private UserResponseDto getExpectedUserDtoFromDb() {
+        return new UserResponseDto()
+                .setId(1L)
+                .setEmail("jan@gmail.com")
+                .setFirstName("Jan")
+                .setLastName("Nowak");
     }
 
-    private CommentDto getCommentDtoSavedByTestMethode() {
-        return new CommentDto()
-                .setText("new comment")
-                .setUserId(1L)
-                .setTaskId(1L);
+    private UserRegistrationRequestDto getUserRegistrationRequestDto() {
+        return new UserRegistrationRequestDto()
+                .setEmail("new@gmail.com")
+                .setPassword("hasolJana")
+                .setRepeatPassword("hasloJana")
+                .setFirstName("Jan")
+                .setLastName("Nowak");
+    }
+
+    private UserResponseDto getUserDtoSavedByTestMethode() {
+        return new UserResponseDto()
+                .setId(1L)
+                .setEmail("new@gmail.com")
+                .setFirstName("Jan")
+                .setLastName("Nowak");
     }
 }
