@@ -10,6 +10,7 @@ import app.model.User;
 import app.repository.CommentRepository;
 import app.repository.TaskRepository;
 import app.repository.UserRepository;
+import app.service.notification.ChangeManager;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDateTime;
@@ -27,6 +28,7 @@ public class CommentServiceImpl implements CommentService {
     private final CommentMapper commentMapper;
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
+    private final ChangeManager changeManager;
 
     public boolean isUserIsTheAuthor(Long commentId, String userEmail) {
         User author = getUserByEmailOrThrowEntityNotFoundException(userEmail);
@@ -38,8 +40,12 @@ public class CommentServiceImpl implements CommentService {
     @Override
     public CommentDto createComment(
             @Valid CommentCreateRequestDto requestDto) {
-        Comment comment = toEntity(requestDto).setTimestamp(LocalDateTime.now());
-        return commentMapper.toDto(commentRepository.save(comment));
+        Comment comment = commentRepository.save(
+                toEntity(requestDto).setTimestamp(LocalDateTime.now()));
+
+        changeManager.notedCommentCreated(comment.getTask().getProject().getId(), comment.getId());
+
+        return commentMapper.toDto(comment);
     }
 
     @Override
@@ -52,15 +58,20 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public void deleteCommentById(Long commentId) {
-        getCommentByIdOrThrowEntityNotFoundException(commentId);
+        Comment comment = getCommentByIdOrThrowEntityNotFoundException(commentId);
         commentRepository.deleteById(commentId);
+
+        changeManager.notedCommentDeleted(comment.getTask().getProject().getId(), comment.getId());
     }
 
     @Override
     public CommentDto updateCommentById(Long commentId, CommentCreateRequestDto requestDto) {
-        Comment updatedComment = getCommentByIdOrThrowEntityNotFoundException(commentId)
-                .setText(requestDto.getText());
-        return commentMapper.toDto(commentRepository.save(updatedComment));
+        Comment updatedComment = commentRepository.save(
+                getCommentByIdOrThrowEntityNotFoundException(commentId)
+                .setText(requestDto.getText()));
+
+        changeManager.notedCommentEdited(updatedComment.getTask().getProject().getId(), commentId);
+        return commentMapper.toDto(updatedComment);
     }
 
     private Comment toEntity(@Valid CommentCreateRequestDto requestDto) {

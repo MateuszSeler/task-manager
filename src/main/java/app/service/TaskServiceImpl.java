@@ -14,6 +14,7 @@ import app.repository.LabelRepository;
 import app.repository.ProjectRepository;
 import app.repository.TaskRepository;
 import app.repository.UserRepository;
+import app.service.notification.ChangeManager;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Set;
@@ -29,12 +30,16 @@ public class TaskServiceImpl implements TaskService {
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final LabelRepository labelRepository;
+    private final ChangeManager changeManager;
 
     @Override
     public TaskDto createTask(Long projectId, TaskCreateRequestDto requestDto) {
-        return taskMapper.toDto(
-                taskRepository.save(
-                        toEntity(requestDto).setStatus(Task.Status.NOT_STARTED)));
+        Task task = taskRepository.save(
+                toEntity(requestDto).setStatus(Task.Status.NOT_STARTED));
+
+        changeManager.notedTaskCreated(projectId, task.getId());
+
+        return taskMapper.toDto(task);
     }
 
     @Override
@@ -61,14 +66,20 @@ public class TaskServiceImpl implements TaskService {
                 .setStatus(Task.Status.valueOf(requestDto.getStatus()))
                 .setDueDate(requestDto.getDueDate())
                 .setAssignee(assignee);
-        return taskMapper.toDto(taskRepository.save(updatedTask));
+
+        taskRepository.save(updatedTask);
+
+        changeManager.notedTaskEdited(updatedTask.getProject().getId(), taskId);
+
+        return taskMapper.toDto(updatedTask);
     }
 
     @Override
     public void deleteById(Long taskId) {
-        getTaskByIdOrThrowEntityNotFoundException(taskId);
+        Task task = getTaskByIdOrThrowEntityNotFoundException(taskId);
         taskRepository.deleteById(taskId);
 
+        changeManager.notedTaskDeleted(task.getProject().getId(), taskId);
     }
 
     @Override
@@ -82,8 +93,12 @@ public class TaskServiceImpl implements TaskService {
         }
 
         task.getLabels().add(label);
+        taskRepository.save(task);
 
-        return taskMapper.toDto(taskRepository.save(task));
+        changeManager.notedLabelWasAdded(
+                task.getProject().getId(), task.getName(), label.getName());
+
+        return taskMapper.toDto(task);
     }
 
     @Override
@@ -97,6 +112,9 @@ public class TaskServiceImpl implements TaskService {
         }
 
         task.getLabels().remove(label);
+
+        changeManager.notedLabelWasRemoved(
+                task.getProject().getId(), task.getName(), label.getName());
     }
 
     private Task toEntity(TaskCreateRequestDto requestDto) {

@@ -28,6 +28,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -37,6 +38,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
         executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
 class CommentControllerTest {
     protected static MockMvc mockMvc;
+    private final WebClient webClient = WebClient.create("http://localhost:8025");
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -72,6 +74,16 @@ class CommentControllerTest {
         assertNotNull(actual.getId());
         EqualsBuilder.reflectionEquals(
                 getCommentDtoSavedByTestMethode(), actual, "id", "timestamp");
+
+        //NOTIFICATION
+        String notificationMsg = "NEW PROJECT: comment has been added";
+        String emailResponse = webClient.get()
+                .uri("/api/v2/messages")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        assertTrue(emailResponse.contains(notificationMsg));
     }
 
     @Test
@@ -111,6 +123,16 @@ class CommentControllerTest {
                 )
                 .andExpect(status().isNoContent())
                 .andReturn();
+
+        //NOTIFICATION
+        String notificationMsg = "NEW PROJECT: comment has been deleted";
+        String emailResponse = webClient.get()
+                .uri("/api/v2/messages")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        assertTrue(emailResponse.contains(notificationMsg));
     }
 
     @Test
@@ -136,6 +158,16 @@ class CommentControllerTest {
 
         Assertions.assertNotNull(actual);
         EqualsBuilder.reflectionEquals(getCommentDtoSavedByTestMethode(), actual);
+
+        //NOTIFICATION
+        String notificationMsg = "NEW PROJECT: comment has been changed";
+        String emailResponse = webClient.get()
+                .uri("/api/v2/messages")
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+
+        assertTrue(emailResponse.contains(notificationMsg));
     }
 
     private UserLoginResponseDto loginUser() throws Exception {
