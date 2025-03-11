@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-tokens-table
+      author: mseler
+      changes:
+        - createTable:
+            tableName: tokens
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: api_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: token
+                  type: varchar(255)
+              - column:
+                  name: generation_time
+                  type: datetime
