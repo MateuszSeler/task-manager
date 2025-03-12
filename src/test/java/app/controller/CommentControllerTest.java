@@ -52,7 +52,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void createComment() throws Exception {
+    void createComment_validatedRequestDto_byProjectMember_success() throws Exception {
         Long projectId = 1L;
         Long taskId = 1L;
         CommentCreateRequestDto requestDto = getCommentCreateRequestDto();
@@ -60,7 +60,7 @@ class CommentControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(
                         post("/projects/{projectId}/tasks/{taskId}/comments/", projectId, taskId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                                .header("Authorization", "Bearer " + loginMember().token())
                                 .content(jsonRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -87,13 +87,13 @@ class CommentControllerTest {
     }
 
     @Test
-    void getCommentsFromTask() throws Exception {
+    void getCommentsFromTask_byProjectManager_setOfOne() throws Exception {
         Long projectId = 1L;
         Long taskId = 1L;
 
         MvcResult mvcResult = mockMvc.perform(
                         get("/projects/{projectId}/tasks/{taskId}/comments/", projectId, taskId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                                .header("Authorization", "Bearer " + loginManager().token())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isOk())
@@ -110,7 +110,7 @@ class CommentControllerTest {
     }
 
     @Test
-    void deleteCommentById() throws Exception {
+    void deleteCommentById_byProjectMember_success() throws Exception {
         Long projectId = 1L;
         Long taskId = 1L;
         Long commentId = 1L;
@@ -118,7 +118,7 @@ class CommentControllerTest {
         MvcResult mvcResult = mockMvc.perform(
                         delete("/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
                                 projectId, taskId, commentId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                                .header("Authorization", "Bearer " + loginManager().token())
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
                 .andExpect(status().isNoContent())
@@ -136,7 +136,23 @@ class CommentControllerTest {
     }
 
     @Test
-    void updateCommentById() throws Exception {
+    void deleteCommentById_byProjectMember_forbidden() throws Exception {
+        Long projectId = 1L;
+        Long taskId = 1L;
+        Long commentId = 1L;
+
+        MvcResult mvcResult = mockMvc.perform(
+                        delete("/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
+                                projectId, taskId, commentId)
+                                .header("Authorization", "Bearer " + loginMember().token())
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    @Test
+    void updateComment_byAuthor_success() throws Exception {
         Long projectId = 1L;
         Long taskId = 1L;
         Long commentId = 1L;
@@ -146,7 +162,7 @@ class CommentControllerTest {
         MvcResult mvcResult = mockMvc.perform(
                         put("/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
                                 projectId, taskId, commentId)
-                                .header("Authorization", "Bearer " + loginUser().token())
+                                .header("Authorization", "Bearer " + loginManager().token())
                                 .content(jsonRequest)
                                 .contentType(MediaType.APPLICATION_JSON)
                 )
@@ -170,10 +186,48 @@ class CommentControllerTest {
         assertTrue(emailResponse.contains(notificationMsg));
     }
 
-    private UserLoginResponseDto loginUser() throws Exception {
+    @Test
+    void updateComment_byNotAuthor_forbidden() throws Exception {
+        Long projectId = 1L;
+        Long taskId = 1L;
+        Long commentId = 1L;
+        CommentCreateRequestDto requestDto = getCommentCreateRequestDto();
+        String jsonRequest = objectMapper.writeValueAsString(requestDto);
+
+        MvcResult mvcResult = mockMvc.perform(
+                        put("/projects/{projectId}/tasks/{taskId}/comments/{commentId}",
+                                projectId, taskId, commentId)
+                                .header("Authorization", "Bearer " + loginMember().token())
+                                .content(jsonRequest)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isForbidden())
+                .andReturn();
+    }
+
+    private UserLoginResponseDto loginManager() throws Exception {
         UserLoginRequestDto userLoginRequestDto = new UserLoginRequestDto()
                 .setEmail("jan@gmail.com")
                 .setPassword("haslojana");
+
+        String jsonRequest = objectMapper.writeValueAsString(userLoginRequestDto);
+
+        MvcResult mvcLoginResult = mockMvc.perform(
+                        post("/authentication/login")
+                                .content(jsonRequest)
+                                .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpect(status().isOk())
+                .andReturn();
+
+        return objectMapper.readValue(
+                mvcLoginResult.getResponse().getContentAsString(), UserLoginResponseDto.class);
+    }
+
+    private UserLoginResponseDto loginMember() throws Exception {
+        UserLoginRequestDto userLoginRequestDto = new UserLoginRequestDto()
+                .setEmail("piotr@gmail.com")
+                .setPassword("haslopiotra");
 
         String jsonRequest = objectMapper.writeValueAsString(userLoginRequestDto);
 

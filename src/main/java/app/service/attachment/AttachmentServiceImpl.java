@@ -2,6 +2,7 @@ package app.service.attachment;
 
 import app.dto.attachment.AttachmentResponseDto;
 import app.dto.attachment.ExternalAttachmentResponseDto;
+import app.exception.DataProcessingException;
 import app.exception.EntityNotFoundException;
 import app.mapper.AttachmentMapper;
 import app.model.Attachment;
@@ -16,24 +17,34 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
-    private final FileStorageProvider fileStorageProvider;
     private final AttachmentRepository attachmentRepository;
     private final AttachmentMapper attachmentMapper;
     private final TaskRepository taskRepository;
+    private final FileStorageProviderFactory providerFactory;
 
     @Override
-    public AttachmentResponseDto uploadFile(Long taskId, MultipartFile file) {
+    public AttachmentResponseDto uploadFile(Long taskId, MultipartFile file, String apiName) {
+        if (attachmentRepository.findByFileName(file.getName()).isPresent()) {
+            throw new DataProcessingException(
+                    "File " + file.getName() + " is already attached to the project");
+        }
+
+        FileStorageProvider fileStorageProvider = providerFactory.getProvider(apiName);
         ExternalAttachmentResponseDto externalAttachmentResponseDto =
                 fileStorageProvider.uploadFile(file);
 
         Attachment attachment = attachmentMapper.toModel(externalAttachmentResponseDto)
-                .setTask(getTaskByIdOrThrowEntityNotFoundException(taskId));
+                .setTask(getTaskByIdOrThrowEntityNotFoundException(taskId))
+                .setApiName(apiName);
 
         return attachmentMapper.toDto(attachmentRepository.save(attachment));
     }
 
     @Override
     public byte[] downloadFile(Long attachmentId) {
+        FileStorageProvider fileStorageProvider = providerFactory.getProvider(
+                getAttachmentByIdOrThrowEntityNotFoundException(attachmentId).getApiName());
+
         String filePath =
                 getAttachmentByIdOrThrowEntityNotFoundException(attachmentId)
                         .getFilePath();
@@ -42,7 +53,10 @@ public class AttachmentServiceImpl implements AttachmentService {
     }
 
     @Override
-    public void deleteLabelById(Long attachmentId) {
+    public void deleteAttachmentById(Long attachmentId) {
+        FileStorageProvider fileStorageProvider = providerFactory.getProvider(
+                getAttachmentByIdOrThrowEntityNotFoundException(attachmentId).getApiName());
+
         String filePath =
                 getAttachmentByIdOrThrowEntityNotFoundException(attachmentId)
                         .getFilePath();

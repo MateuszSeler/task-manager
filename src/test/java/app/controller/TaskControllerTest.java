@@ -195,7 +195,7 @@ class TaskControllerTest {
     }
 
     @Test
-    void deleteTaskById_success() throws Exception {
+    void deleteTaskById_byProjectManager_success() throws Exception {
         Long projectId = 2L;
         Long taskId = 1L;
 
@@ -219,7 +219,7 @@ class TaskControllerTest {
     }
 
     @Test
-    void addLabelToTask() throws Exception {
+    void addLabelToTask_byProjectManager_success() throws Exception {
         Long projectId = 1L;
         Long taskId = 1L;
         Long labelId = 1L;
@@ -235,7 +235,7 @@ class TaskControllerTest {
     }
 
     @Test
-    void removeLabelFromTask() throws Exception {
+    void removeLabelFromTask_byProjectManager_success() throws Exception {
         Long projectId = 1L;
         Long taskId = 2L;
         Long labelId = 1L;

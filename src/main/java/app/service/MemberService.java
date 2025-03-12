@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 public interface MemberService {
-    boolean whetherUserIsMember(@NotNull Long projectId, String userEmail);
+    boolean whetherUserIsMember(@NotNull Long projectId, @NotNull String userEmail);
 
     boolean isUserManagingTheProject(@NotNull Long projectId, String userEmail);
 

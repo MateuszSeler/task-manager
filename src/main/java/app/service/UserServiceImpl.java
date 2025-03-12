@@ -9,6 +9,7 @@ import app.model.Role;
 import app.model.User;
 import app.repository.RoleRepository;
 import app.repository.UserRepository;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,7 +26,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public UserResponseDto register(UserRegistrationRequestDto userRegistrationRequestDto) {
+    public UserResponseDto register(@Valid UserRegistrationRequestDto userRegistrationRequestDto) {
         if (userRepository.findByEmail(userRegistrationRequestDto.getEmail()).isPresent()) {
             throw new RegistrationException("User with email: "
                     + userRegistrationRequestDto.getEmail() + " not found");
@@ -44,19 +45,20 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto getByEmail(String email) {
+    public UserResponseDto getByEmail(@NotNull String email) {
         return userMapper.toDto(userRepository.findByEmail(email).orElseThrow(
                 () -> new EntityNotFoundException("User with email: " + email + " not found")));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public UserResponseDto findById(Long id) {
+    public UserResponseDto findById(@NotNull Long id) {
         return userMapper.toDto(userRepository.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + id + " not found")));
     }
 
     @Override
+    @Transactional
     public UserResponseDto updateProfile(Long userId, UserRegistrationRequestDto requestDto) {
         User user = getUserByIdOrThrowEntityNotFoundException(userId)
                 .setEmail(requestDto.getEmail())
@@ -67,21 +69,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deletingById(Long userId) {
+    @Transactional
+    public void deletingById(@NotNull Long userId) {
         getUserByIdOrThrowEntityNotFoundException(userId);
         userRepository.deleteById(userId);
     }
 
     @Override
-    public UserResponseDto getById(Long userId) {
+    @Transactional(readOnly = true)
+    public UserResponseDto getById(@NotNull Long userId) {
         return userMapper.toDto(getUserByIdOrThrowEntityNotFoundException(userId));
     }
 
+    @Transactional(readOnly = true)
     private User getUserByIdOrThrowEntityNotFoundException(@NotNull Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + userId + " not found"));
     }
 
+    @Transactional(readOnly = true)
     private Role getDefaultUserRole() {
         return roleRepository.findByRoleType(Role.RoleName.ROLE_USER)
                 .orElseThrow(() -> new EntityNotFoundException("User role not found"));

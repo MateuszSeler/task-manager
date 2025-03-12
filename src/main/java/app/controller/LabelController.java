@@ -7,6 +7,7 @@ import app.service.LabelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class LabelController {
     @Operation(summary = "getting labels",
             description = "getting labels from the project")
     public LabelDto getLabelById(
-            @PathVariable @Valid Long labelId) {
+            @PathVariable @NotNull Long labelId) {
         return labelService.getLabelById(labelId);
     }
 
@@ -61,7 +62,7 @@ public class LabelController {
     @Operation(summary = "updating label",
             description = "updating label by id")
     public LabelDto updateLabel(
-            @PathVariable @Valid Long labelId,
+            @PathVariable @NotNull Long labelId,
             @RequestBody @Valid LabelUpdateRequestDto requestDto) {
         return labelService.updateLabel(labelId, requestDto);
     }
@@ -72,7 +73,7 @@ public class LabelController {
             description = "deleting label by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteLabelById(
-            @PathVariable @Valid Long labelId) {
+            @PathVariable @NotNull Long labelId) {
         labelService.deleteLabelById(labelId);
     }
 }

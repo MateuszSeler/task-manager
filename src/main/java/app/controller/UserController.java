@@ -6,6 +6,7 @@ import app.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -52,7 +53,7 @@ public class UserController {
     @GetMapping("/{userId}")
     @Operation(summary = "getting user",
             description = "getting user by id")
-    public UserResponseDto getUserById(@PathVariable @Valid Long userId) {
+    public UserResponseDto getUserById(@PathVariable @NotNull Long userId) {
         return userService.getById(userId);
     }
 
@@ -61,7 +62,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "deleting user",
             description = "deleting user by id")
-    public void deletingUserById(@PathVariable @Valid Long userId) {
+    public void deletingUserById(@PathVariable @NotNull Long userId) {
         userService.deletingById(userId);
     }
 }

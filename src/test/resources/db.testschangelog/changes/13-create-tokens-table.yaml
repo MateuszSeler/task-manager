@@ -21,7 +21,7 @@ databaseChangeLog:
                     unique: true
               - column:
                   name: token
-                  type: varchar(255)
+                  type: varchar(1024)
               - column:
-                  name: generation_time
+                  name: expiration_time
                   type: datetime

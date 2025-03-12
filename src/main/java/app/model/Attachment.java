@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.Instant;
 import lombok.Data;
@@ -34,5 +35,6 @@ public class Attachment {
     @ManyToOne
     @JoinColumn(name = "task_id")
     private Task task;
-
+    @NotBlank
+    private String apiName;
 }

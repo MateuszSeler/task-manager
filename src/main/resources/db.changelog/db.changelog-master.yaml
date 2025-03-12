@@ -25,3 +25,5 @@ databaseChangeLog:
       file: db.changelog/changes/12-insert-roles.yaml
   - include:
       file: db.changelog/changes/13-create-tokens-table.yaml
+  - include:
+      file: db.changelog/changes/14-add-api_name-attachments-table.yaml

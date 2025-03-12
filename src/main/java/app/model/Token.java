@@ -24,5 +24,5 @@ public class Token {
     @NotNull
     private String token;
     @NotNull
-    private Instant generationTime;
+    private Instant expirationTime;
 }

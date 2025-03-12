@@ -4,6 +4,7 @@ import app.dto.label.LabelCreateRequestDto;
 import app.dto.label.LabelDto;
 import app.dto.label.LabelUpdateRequestDto;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 
 public interface LabelService {
@@ -12,11 +13,11 @@ public interface LabelService {
 
     Set<LabelDto> getLabelsFromProject();
 
-    LabelDto updateLabel(@Valid Long labelId, @Valid LabelUpdateRequestDto requestDto);
+    LabelDto updateLabel(@NotNull Long labelId, @Valid LabelUpdateRequestDto requestDto);
 
-    void deleteLabelById(@Valid Long labelId);
+    void deleteLabelById(@NotNull Long labelId);
 
-    LabelDto getLabelById(@Valid Long labelId);
+    LabelDto getLabelById(@NotNull Long labelId);
 
     Set<LabelDto> getLabels();
 }

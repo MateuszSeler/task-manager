@@ -60,7 +60,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     }
 
     @ExceptionHandler({EntityNotFoundException.class})
-    public ResponseEntity<Object> handleAuthenticationException(EntityNotFoundException exception) {
+    public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException exception) {
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage());
@@ -70,6 +70,14 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     public ResponseEntity<Object> handleDataProcessingException(DataProcessingException exception) {
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
+                .body(exception.getMessage());
+    }
+
+    @ExceptionHandler({DropBoxProcessingException.class})
+    public ResponseEntity<Object> handleDropBoxProcessingException(
+            DropBoxProcessingException exception) {
+        return ResponseEntity
+                .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(exception.getMessage());
     }
 }

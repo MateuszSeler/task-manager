@@ -48,6 +48,7 @@ class AttachmentControllerTest {
     void adding_downloading_deleting_testFile_success() throws Exception {
         Long projectId = 1L;
         Long taskId = 1L;
+        String apiName = "DropBox";
 
         //UPLOADING
         MockMultipartFile file = new MockMultipartFile(
@@ -55,8 +56,8 @@ class AttachmentControllerTest {
         );
 
         MvcResult uploadingResult = mockMvc.perform(
-                        multipart("/projects/{projectId}/tasks/{taskId}/attachments/",
-                                projectId, taskId)
+                        multipart("/projects/{projectId}/tasks/{taskId}/attachments/{apiName}",
+                                projectId, taskId, apiName)
                                 .file(file)
                                 .header("Authorization", "Bearer " + loginUser().token())
                                 .contentType(MediaType.APPLICATION_JSON)

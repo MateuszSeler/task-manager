@@ -11,10 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "authentication manger",
@@ -27,12 +27,11 @@ public class AuthenticationController {
     private final AuthenticationService authenticationService;
 
     @PostMapping("registration")
+    @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "registration", description = "registration of new user")
-    public ResponseEntity<UserResponseDto> register(
+    public UserResponseDto register(
             @RequestBody @Valid UserRegistrationRequestDto userRegistrationRequestDto) {
-        return ResponseEntity
-                .status(HttpStatus.CREATED)
-                .body(userService.register(userRegistrationRequestDto));
+        return userService.register(userRegistrationRequestDto);
     }
 
     @PostMapping("login")

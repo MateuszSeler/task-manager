@@ -93,7 +93,7 @@ class LabelControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void updateLabels_validatedRequestDto_byProjectManager_success() throws Exception {
+    void updateLabels_validatedRequestDto_success() throws Exception {
         Long labelId = 1L;
         LabelUpdateRequestDto requestDto = getLabelUpdateRequestDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
