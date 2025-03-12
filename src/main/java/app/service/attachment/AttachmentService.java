@@ -6,7 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface AttachmentService {
-    AttachmentResponseDto uploadFile(Long taskId, MultipartFile file);
+    AttachmentResponseDto uploadFile(Long taskId, MultipartFile file, String apiName);
 
     byte[] downloadFile(@NotNull Long attachmentId);
 

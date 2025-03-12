@@ -10,10 +10,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Component("DROPBOX")
 @RequiredArgsConstructor
 public class FileStorageProviderDropboxImpl implements FileStorageProvider {
     private final DbxClientV2 dropboxClient;

@@ -27,15 +27,16 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
-    @PostMapping("/{projectId}/tasks/{taskId}/attachments/")
+    @PostMapping("/{projectId}/tasks/{taskId}/attachments/{apiName}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "upload attachment",
             description = "attaching new file to the task")
     public AttachmentResponseDto add(
             @PathVariable @Valid Long projectId,
             @PathVariable @Valid Long taskId,
+            @PathVariable @Valid String apiName,
             @RequestParam MultipartFile file) {
-        return attachmentService.uploadFile(taskId, file);
+        return attachmentService.uploadFile(taskId, file, apiName);
     }
 
     @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")

@@ -16,24 +16,29 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 @Service
 public class AttachmentServiceImpl implements AttachmentService {
-    private final FileStorageProvider fileStorageProvider;
     private final AttachmentRepository attachmentRepository;
     private final AttachmentMapper attachmentMapper;
     private final TaskRepository taskRepository;
+    private final FileStorageProviderFactory providerFactory;
 
     @Override
-    public AttachmentResponseDto uploadFile(Long taskId, MultipartFile file) {
+    public AttachmentResponseDto uploadFile(Long taskId, MultipartFile file, String apiName) {
+        FileStorageProvider fileStorageProvider = providerFactory.getProvider(apiName);
         ExternalAttachmentResponseDto externalAttachmentResponseDto =
                 fileStorageProvider.uploadFile(file);
 
         Attachment attachment = attachmentMapper.toModel(externalAttachmentResponseDto)
-                .setTask(getTaskByIdOrThrowEntityNotFoundException(taskId));
+                .setTask(getTaskByIdOrThrowEntityNotFoundException(taskId))
+                .setApiName(apiName);
 
         return attachmentMapper.toDto(attachmentRepository.save(attachment));
     }
 
     @Override
     public byte[] downloadFile(Long attachmentId) {
+        FileStorageProvider fileStorageProvider = providerFactory.getProvider(
+                getAttachmentByIdOrThrowEntityNotFoundException(attachmentId).getApiName());
+
         String filePath =
                 getAttachmentByIdOrThrowEntityNotFoundException(attachmentId)
                         .getFilePath();
@@ -43,6 +48,9 @@ public class AttachmentServiceImpl implements AttachmentService {
 
     @Override
     public void deleteLabelById(Long attachmentId) {
+        FileStorageProvider fileStorageProvider = providerFactory.getProvider(
+                getAttachmentByIdOrThrowEntityNotFoundException(attachmentId).getApiName());
+
         String filePath =
                 getAttachmentByIdOrThrowEntityNotFoundException(attachmentId)
                         .getFilePath();
