@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: add-api_name-attachments-table
+      author: mseler
+      changes:
+        - addColumn:
+            tableName: attachments
+            columns:
+              - column:
+                  name: api_name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+                    unique: true

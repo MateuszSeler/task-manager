@@ -6,6 +6,7 @@ import app.service.CommentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -34,8 +35,8 @@ public class CommentController {
     @Operation(summary = "creating comment",
             description = "adding new comment to the task")
     public CommentDto createComment(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
             @RequestBody @Valid CommentCreateRequestDto requestDto) {
         return commentService.createComment(requestDto);
     }
@@ -45,8 +46,8 @@ public class CommentController {
     @Operation(summary = "getting comment",
             description = "getting comment attached to the task")
     public Set<CommentDto> getCommentsFromTask(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId) {
         return commentService.getCommentsFromTask(taskId);
     }
 
@@ -55,9 +56,9 @@ public class CommentController {
     @Operation(summary = "updating comment",
             description = "updating comment by id")
     CommentDto updateCommentById(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
-            @PathVariable @Valid Long commentId,
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull Long commentId,
             @RequestBody @Valid CommentCreateRequestDto requestDto) {
         return commentService.updateCommentById(commentId, requestDto);
     }
@@ -69,9 +70,9 @@ public class CommentController {
             description = "deleting comment by id")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteLabelCommentById(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
-            @PathVariable @Valid Long commentId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull Long commentId) {
         commentService.deleteCommentById(commentId);
     }
 }

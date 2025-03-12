@@ -1,6 +1,7 @@
 package app.service.attachment;
 
 import app.dto.attachment.ExternalAttachmentResponseDto;
+import app.exception.DropBoxProcessingException;
 import com.dropbox.core.DbxException;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
@@ -10,10 +11,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
+@Component("DROPBOX")
 @RequiredArgsConstructor
 public class FileStorageProviderDropboxImpl implements FileStorageProvider {
     private final DbxClientV2 dropboxClient;
@@ -33,7 +36,7 @@ public class FileStorageProviderDropboxImpl implements FileStorageProvider {
                     metadata.getName(),
                     Instant.now());
         } catch (IOException | DbxException e) {
-            throw new RuntimeException("Uploading file to Dropbox failed", e);
+            throw new DropBoxProcessingException("Uploading file to Dropbox failed", e);
         }
     }
 
@@ -43,7 +46,7 @@ public class FileStorageProviderDropboxImpl implements FileStorageProvider {
                 .getInputStream()) {
             return inputStream.readAllBytes();
         } catch (Exception e) {
-            throw new RuntimeException("Downloading file from Dropbox failed: ", e);
+            throw new DropBoxProcessingException("Downloading file from Dropbox failed: ", e);
         }
     }
 
@@ -51,7 +54,7 @@ public class FileStorageProviderDropboxImpl implements FileStorageProvider {
         try {
             dropboxClient.files().deleteV2(filePath);
         } catch (Exception e) {
-            throw new RuntimeException("Deleting file from Dropbox failed: ", e);
+            throw new DropBoxProcessingException("Deleting file from Dropbox failed: ", e);
         }
     }
 
@@ -76,7 +79,7 @@ public class FileStorageProviderDropboxImpl implements FileStorageProvider {
             return sharedLink.getUrl().replace("?dl=0", "?raw=1");
 
         } catch (DbxException e) {
-            throw new RuntimeException("Failed to generate link", e);
+            throw new DropBoxProcessingException("Failed to generate link", e);
         }
     }
 }

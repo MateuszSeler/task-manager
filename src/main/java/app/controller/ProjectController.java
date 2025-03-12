@@ -7,6 +7,7 @@ import app.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,7 @@ public class ProjectController {
     @GetMapping("/{projectId}")
     @Operation(summary = "getting project",
             description = "getting project by id")
-    public ProjectDto getProjectById(@PathVariable @Valid Long projectId) {
+    public ProjectDto getProjectById(@PathVariable @NotNull Long projectId) {
         return projectService.getProjectById(projectId);
     }
 
@@ -67,7 +68,7 @@ public class ProjectController {
     @Operation(summary = "updating project",
             description = "updating project")
     public ProjectDto updateProjectById(
-            @PathVariable @Valid Long projectId,
+            @PathVariable @NotNull Long projectId,
             @RequestBody @Valid ProjectCreateRequestDto requestDto) {
         return projectService.updateProjectById(projectId, requestDto);
     }
@@ -78,7 +79,7 @@ public class ProjectController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @Operation(summary = "deleting projects",
             description = "deleting project by id")
-    public void deleteProjectById(@PathVariable @Valid Long projectId) {
+    public void deleteProjectById(@PathVariable @NotNull Long projectId) {
         projectService.deleteById(projectId);
     }
 }

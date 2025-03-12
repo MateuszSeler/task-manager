@@ -36,7 +36,7 @@ public class TaskController {
     @Operation(summary = "creating task",
             description = "adding new task to the project")
     public TaskDto createTask(
-            @PathVariable @Valid Long projectId,
+            @PathVariable @NotNull Long projectId,
             @RequestBody @Valid TaskCreateRequestDto taskCreateRequestDto) {
         return taskService.createTask(projectId, taskCreateRequestDto);
     }
@@ -45,7 +45,7 @@ public class TaskController {
     @GetMapping("/{projectId}/tasks")
     @Operation(summary = "getting tasks",
             description = "getting tasks from the project")
-    public Set<TaskDto> getTasksFromProject(@PathVariable @Valid Long projectId) {
+    public Set<TaskDto> getTasksFromProject(@PathVariable @NotNull Long projectId) {
         return taskService.getTasksFromProject(projectId);
     }
 
@@ -54,8 +54,8 @@ public class TaskController {
     @Operation(summary = "getting task",
             description = "getting task by id")
     public TaskDto getTaskById(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId) {
         return taskService.getTaskById(taskId);
     }
 
@@ -64,7 +64,7 @@ public class TaskController {
     @Operation(summary = "updating tasks",
             description = "updating tasks from the project")
     public TaskDto updateTaskById(
-            @PathVariable @Valid Long projectId,
+            @PathVariable @NotNull Long projectId,
             @PathVariable @NotNull Long taskId,
             @RequestBody @Valid TaskUpdateRequestDto requestDto) {
         return taskService.updateTaskById(taskId, requestDto);
@@ -76,8 +76,8 @@ public class TaskController {
     @Operation(summary = "deleting tasks",
             description = "deleting tasks from the project")
     public void deleteTaskById(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId) {
         taskService.deleteById(taskId);
     }
 
@@ -89,9 +89,9 @@ public class TaskController {
     @Operation(summary = "adding label",
             description = "adding new label to the task")
     public TaskDto addLabelToTask(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
-            @PathVariable @Valid Long labelId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull Long labelId) {
         return taskService.addLabelToTask(taskId, labelId);
     }
 
@@ -103,9 +103,9 @@ public class TaskController {
     @Operation(summary = "deleting label",
             description = "deleting label from the task")
     public void removeLabelFromTask(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
-            @PathVariable @Valid Long labelId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull Long labelId) {
         taskService.removeLabelFromTask(taskId, labelId);
     }
 }

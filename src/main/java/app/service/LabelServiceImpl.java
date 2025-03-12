@@ -11,11 +11,13 @@ import app.model.Task;
 import app.repository.LabelRepository;
 import app.repository.ProjectRepository;
 import app.repository.TaskRepository;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -26,13 +28,15 @@ public class LabelServiceImpl implements LabelService {
     private final TaskRepository taskRepository;
 
     @Override
-    public LabelDto createLabel(LabelCreateRequestDto requestDto) {
+    @Transactional
+    public LabelDto createLabel(@Valid LabelCreateRequestDto requestDto) {
         return labelMapper.toDto(
                 labelRepository.save(
                         labelMapper.toModel(requestDto)));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Set<LabelDto> getLabelsFromProject() {
         return labelRepository.findAll()
                 .stream()
@@ -41,7 +45,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public LabelDto updateLabel(Long labelId, LabelUpdateRequestDto requestDto) {
+    public LabelDto updateLabel(@NotNull Long labelId, @Valid LabelUpdateRequestDto requestDto) {
         Label updatedLabel = getLabelByIdOrThrowEntityNotFoundException(labelId)
                 .setName(requestDto.getName())
                 .setColor(Label.Color.valueOf(requestDto.getColor()));
@@ -50,7 +54,7 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public void deleteLabelById(Long labelId) {
+    public void deleteLabelById(@NotNull Long labelId) {
         Label labelToDelete = getLabelByIdOrThrowEntityNotFoundException(labelId);
 
         Set<Task> tasksMarkedByLabel = taskRepository.findTasksMarkedByLabel(labelId);
@@ -62,11 +66,13 @@ public class LabelServiceImpl implements LabelService {
     }
 
     @Override
-    public LabelDto getLabelById(Long labelId) {
+    @Transactional(readOnly = true)
+    public LabelDto getLabelById(@NotNull Long labelId) {
         return labelMapper.toDto(getLabelByIdOrThrowEntityNotFoundException(labelId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Set<LabelDto> getLabels() {
         return labelRepository.getAll()
                 .stream()
@@ -74,12 +80,14 @@ public class LabelServiceImpl implements LabelService {
                 .collect(Collectors.toSet());
     }
 
+    @Transactional(readOnly = true)
     private Project getProjectByIdOrThrowEntityNotFoundException(@NotNull Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(
                 () -> new EntityNotFoundException(
                         "Project with id: " + projectId + " not found"));
     }
 
+    @Transactional(readOnly = true)
     private Label getLabelByIdOrThrowEntityNotFoundException(@NotNull Long labelId) {
         return labelRepository.findById(labelId).orElseThrow(
                 () -> new EntityNotFoundException(

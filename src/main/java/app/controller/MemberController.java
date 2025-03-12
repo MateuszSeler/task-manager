@@ -4,7 +4,7 @@ import app.dto.user.UserResponseDto;
 import app.service.MemberService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,8 +27,8 @@ public class MemberController {
     @Operation(summary = "adding member",
             description = "adding user to the project")
     public Set<UserResponseDto> addUserToProject(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long userId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long userId) {
         return memberService.addUserToProject(projectId, userId);
     }
 
@@ -37,8 +37,8 @@ public class MemberController {
     @Operation(summary = "deleting member",
             description = "removing user from the project")
     public Set<UserResponseDto> deleteMember(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long userId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long userId) {
         return memberService.deleteUserFromProject(projectId, userId);
     }
 
@@ -47,8 +47,8 @@ public class MemberController {
     @Operation(summary = "changing user role",
             description = "changing user role in the project")
     public Set<UserResponseDto> makeUserManagerOfTheProject(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long userId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long userId) {
         return memberService.makeUserManagerOfTheProject(projectId, userId);
     }
 
@@ -57,8 +57,8 @@ public class MemberController {
     @Operation(summary = "changing user role",
             description = "changing user role in the project")
     public Set<UserResponseDto> removeUserFromTheProjectManagerRole(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long userId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long userId) {
         return memberService.removeUserFromTheProjectManagerRole(projectId, userId);
     }
 }

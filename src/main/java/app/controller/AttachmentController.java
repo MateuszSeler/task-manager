@@ -4,7 +4,7 @@ import app.dto.attachment.AttachmentResponseDto;
 import app.service.attachment.AttachmentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,15 +27,16 @@ public class AttachmentController {
     private final AttachmentService attachmentService;
 
     @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
-    @PostMapping("/{projectId}/tasks/{taskId}/attachments/")
+    @PostMapping("/{projectId}/tasks/{taskId}/attachments/{apiName}")
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "upload attachment",
             description = "attaching new file to the task")
     public AttachmentResponseDto add(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull String apiName,
             @RequestParam MultipartFile file) {
-        return attachmentService.uploadFile(taskId, file);
+        return attachmentService.uploadFile(taskId, file, apiName);
     }
 
     @PreAuthorize("@memberService.whetherUserIsMember(#projectId, authentication.name)")
@@ -43,9 +44,9 @@ public class AttachmentController {
     @Operation(summary = "download attachment",
             description = "downloading attachment attachment by id")
     public byte[] getCommentsFromTask(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
-            @PathVariable @Valid Long fileId) {
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull Long fileId) {
         return attachmentService.downloadFile(fileId);
     }
 
@@ -55,9 +56,9 @@ public class AttachmentController {
             description = "deleting attachment from the task")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void deleteLabelById(
-            @PathVariable @Valid Long projectId,
-            @PathVariable @Valid Long taskId,
-            @PathVariable @Valid Long fileId) {
-        attachmentService.deleteLabelById(fileId);
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @PathVariable @NotNull Long fileId) {
+        attachmentService.deleteAttachmentById(fileId);
     }
 }

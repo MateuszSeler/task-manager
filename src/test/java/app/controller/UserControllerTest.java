@@ -64,7 +64,7 @@ class UserControllerTest {
     }
 
     @Test
-    void updateUserProfile() throws Exception {
+    void updateUserProfile_byOwner_userDto() throws Exception {
         UserRegistrationRequestDto requestDto = getUserRegistrationRequestDto();
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
 
@@ -86,7 +86,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void getUserById() throws Exception {
+    void getUserById_userDto() throws Exception {
         Long userId = 1L;
 
         MvcResult mvcResult = mockMvc.perform(
@@ -105,7 +105,7 @@ class UserControllerTest {
 
     @Test
     @WithMockUser(username = "admin", roles = "ADMIN")
-    void deletingUserById() throws Exception {
+    void deletingUserById_success() throws Exception {
         Long userId = 1L;
 
         MvcResult mvcResult = mockMvc.perform(

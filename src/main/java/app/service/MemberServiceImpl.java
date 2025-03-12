@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -24,6 +25,7 @@ public class MemberServiceImpl implements MemberService {
     private final UserMapper userMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public boolean whetherUserIsMember(@NotNull Long projectId, @NotNull String userEmail) {
         User owner = getUserByEmailOrThrowEntityNotFoundException(userEmail);
         return projectRepository
@@ -32,6 +34,7 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public boolean isUserManagingTheProject(@NotNull Long projectId, @NotNull String userEmail) {
         User owner = getUserByEmailOrThrowEntityNotFoundException(userEmail);
         return projectRepository
@@ -41,7 +44,8 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Set<UserResponseDto> addUserToProject(Long projectId, Long userId) {
+    @Transactional
+    public Set<UserResponseDto> addUserToProject(@NotNull Long projectId, @NotNull Long userId) {
         User user = getUserByIdOrThrowEntityNotFoundException(userId);
         Project project = getProjectByIdOrThrowEntityNotFoundException(projectId);
 
@@ -60,7 +64,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Set<UserResponseDto> deleteUserFromProject(Long projectId, Long userId) {
+    @Transactional
+    public Set<UserResponseDto> deleteUserFromProject(
+            @NotNull Long projectId, @NotNull Long userId) {
         User user = getUserByIdOrThrowEntityNotFoundException(userId);
         Project project = getProjectByIdOrThrowEntityNotFoundException(projectId);
         if (!project.getProjectMembers().contains(user)) {
@@ -87,7 +93,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Set<UserResponseDto> makeUserManagerOfTheProject(Long projectId, Long userId) {
+    @Transactional
+    public Set<UserResponseDto> makeUserManagerOfTheProject(
+            @NotNull Long projectId, @NotNull Long userId) {
         User user = getUserByIdOrThrowEntityNotFoundException(userId);
         Project project = getProjectByIdOrThrowEntityNotFoundException(projectId);
         if (!project.getProjectMembers().contains(user)) {
@@ -110,7 +118,9 @@ public class MemberServiceImpl implements MemberService {
     }
 
     @Override
-    public Set<UserResponseDto> removeUserFromTheProjectManagerRole(Long projectId, Long userId) {
+    @Transactional
+    public Set<UserResponseDto> removeUserFromTheProjectManagerRole(
+            @NotNull Long projectId, @NotNull Long userId) {
         User user = getUserByIdOrThrowEntityNotFoundException(userId);
         Project project = getProjectByIdOrThrowEntityNotFoundException(projectId);
         if (!project.getProjectManagers().contains(user)) {
@@ -132,16 +142,19 @@ public class MemberServiceImpl implements MemberService {
                 .collect(Collectors.toSet());
     }
 
+    @Transactional(readOnly = true)
     private User getUserByIdOrThrowEntityNotFoundException(@NotNull Long userId) {
         return userRepository.findById(userId).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + userId + " not found"));
     }
 
+    @Transactional(readOnly = true)
     private User getUserByEmailOrThrowEntityNotFoundException(@NotNull String userEmail) {
         return userRepository.findByEmail(userEmail).orElseThrow(
                 () -> new EntityNotFoundException("User with id: " + userEmail + " not found"));
     }
 
+    @Transactional(readOnly = true)
     private Project getProjectByIdOrThrowEntityNotFoundException(@NotNull Long projectId) {
         return projectRepository.findById(projectId).orElseThrow(
                 () -> new EntityNotFoundException(
