@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -18,6 +20,8 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
+    private static final Logger errorLogger = LogManager.getRootLogger();
+
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
             MethodArgumentNotValidException ex,
@@ -33,6 +37,9 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
                 .map(this::getErrorMessage)
                 .toList();
         errors.put("errors", listOfErrors);
+
+        logger.error("Validation failed: " + listOfErrors.toString());
+
         return new ResponseEntity<>(errors, headers, status);
     }
 
@@ -47,6 +54,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({RegistrationException.class})
     public ResponseEntity<Object> handleRegistrationException(RegistrationException exception) {
+        errorLogger.error("Registration failed: " + exception.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(exception.getMessage());
@@ -54,6 +63,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({AuthenticationException.class})
     public ResponseEntity<Object> handleAuthenticationException(AuthenticationException exception) {
+        errorLogger.warn("Authentication failed: " + exception.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.UNAUTHORIZED)
                 .body(exception.getMessage());
@@ -61,6 +72,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({EntityNotFoundException.class})
     public ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException exception) {
+        errorLogger.error("Entity searcher failed: " + exception.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
                 .body(exception.getMessage());
@@ -68,6 +81,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
 
     @ExceptionHandler({DataProcessingException.class})
     public ResponseEntity<Object> handleDataProcessingException(DataProcessingException exception) {
+        errorLogger.error("Data processing failed: " + exception.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
                 .body(exception.getMessage());
@@ -76,6 +91,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler({DropBoxProcessingException.class})
     public ResponseEntity<Object> handleDropBoxProcessingException(
             DropBoxProcessingException exception) {
+        errorLogger.error("DropBox processing failed: " + exception.getMessage());
+
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(exception.getMessage());

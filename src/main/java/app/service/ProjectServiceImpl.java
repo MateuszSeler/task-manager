@@ -21,12 +21,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 public class ProjectServiceImpl implements ProjectService {
+    private static final Logger appLogger = LogManager.getLogger("ApplicationLogger");
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
     private final UserRepository userRepository;
@@ -49,7 +52,13 @@ public class ProjectServiceImpl implements ProjectService {
             throw new DataProcessingException("EndDate should be placed after StartDate");
         }
 
-        return projectMapper.toDto(projectRepository.save(newProject));
+        Project project = projectRepository.save(newProject);
+        appLogger.info("new project have been created: "
+                + project.getName()
+                + " by user: "
+                + owner.getEmail());
+
+        return projectMapper.toDto(project);
     }
 
     @Override
@@ -89,7 +98,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     @Transactional
     public void deleteById(@NotNull Long projectId) {
-        getProjectByIdOrThrowEntityNotFoundException(projectId);
+        Project project = getProjectByIdOrThrowEntityNotFoundException(projectId);
 
         Set<Task> tasksFromProject = taskRepository
                 .getTasksFromProjectWithNoUserNoProjectNoLabels(projectId);
@@ -108,6 +117,8 @@ public class ProjectServiceImpl implements ProjectService {
         }
 
         projectRepository.deleteById(projectId);
+        appLogger.info("project have been deleted: "
+                + project.getName());
     }
 
     @Transactional(readOnly = true)

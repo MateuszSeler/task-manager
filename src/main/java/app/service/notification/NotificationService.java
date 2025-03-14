@@ -1,17 +1,22 @@
 package app.service.notification;
 
 import app.dto.project.ProjectDto;
-import app.dto.user.UserResponseDto;
 import app.service.ProjectService;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationService {
+    private static final Logger errorLogger = LogManager.getRootLogger();
     private final ProjectService projectService;
     private final EmailService emailService;
+    private final Executor executor;
 
     @EventListener
     public void notedChangeInTheProject(ProjectEvent event) {
@@ -32,8 +37,17 @@ public class NotificationService {
             massage = event.getCustomMassage();
         }
 
-        for (UserResponseDto user : project.getProjectMembers()) {
-            emailService.sendEmail(user.getEmail(), subject, massage);
-        }
+        project.getProjectMembers()
+                .stream()
+                .map(user -> CompletableFuture.runAsync(
+                        () -> emailService.sendEmail(user.getEmail(), subject, massage), executor)
+                        .exceptionally(ex -> {
+                            errorLogger.error("message about "
+                                    + subject
+                                    + " wasn't send to "
+                                    + user.getEmail());
+                            return null;
+                        }))
+                .toList();
     }
 }

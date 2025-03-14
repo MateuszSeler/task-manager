@@ -125,15 +125,27 @@ Since Dropbox API requires **OAuth 2.0**, the application:
 
 ## 🔔 Event-Based Notification System  
 
-The application includes a **scalable event-driven notification system** that allows flexible event handling. It is designed to be easily extended with additional notification channels.  
+The notification system ensures that users are informed about important project updates while maintaining **flexibility, scalability, and performance**.  
 
 ### 🏗️ Architecture  
 
-The notification system is built using the **EventProject** model, which follows the **Builder Pattern**.  
+✔ **Centralized event handling** – `ChangeManager` serves as the main communication hub between the application and notification services.  
+✔ **Flexible event structure** – `ProjectEvent` follows the **Builder Pattern**, allowing easy modification and extension.  
+✔ **Asynchronous processing** – Notifications are sent concurrently, improving efficiency.  
+✔ **Expandable notification channels** – Designed to integrate additional services (e.g., Slack, WebSockets).  
 
-✔ **Event-driven approach** – Enables flexible and scalable notifications.  
-✔ **Supports multiple event types** – Task updates, new comments, file uploads, etc.  
-✔ **Designed for easy extension** – New notification channels can be added with minimal effort.  
+### 🔄 **Notification System Flow**  
+
+1️⃣ **`ChangeManager` acts as the central notification coordinator**, receiving and dispatching project-related events.  
+
+2️⃣ **`ProjectEvent` is a dynamic event model** based on the **Builder Pattern**, allowing flexible event definitions. Any project-related event can be constructed dynamically without requiring multiple classes.  
+
+3️⃣ **Extending `ProjectEvent` is straightforward** – just add a new field to the class and its constructor. Thanks to Lombok annotations, the builder pattern will automatically include it, simplifying modifications.  
+
+4️⃣ **Custom event types can be added when necessary** – while `ProjectEvent` covers most scenarios, separate event classes (e.g., `UserRegistrationEvent`) can be introduced where needed.  
+
+5️⃣ **Notifications are processed asynchronously** – The notification service utilizes **multi-threading** to handle multiple recipients in parallel. Messages are passed through a **`CompletableFuture` pipeline**, allowing easy integration of additional notification services.  
+ows seamless integration with **other notification systems** such as WebSockets, push notifications, or third-party services like Slack and Microsoft Teams. 
 
 ### 📌 Components  
 
@@ -142,13 +154,6 @@ The notification system is built using the **EventProject** model, which follows
 - **`NotificationService`** – Sends notifications through various channels.  
 - **`EmailService`** – Handles email notifications (integrated with Gmail).  
 
-### 🔄 Event Flow  
-
-1. **An action occurs**
-2. **A `ProjectEvent` is created** using the **Builder Pattern**   
-3. **ChangeManager processes the event** and triggers the appropriate notifications
-4. Notifications are sent via email (EmailService).
-5. NotificationService determines the appropriate communication channel and sends notifications. By default, it delegates email notifications to EmailService but the service is open to expansion with other notification systems
 
 ### ✉️ Email Notifications Configuration
 By default, notifications are sent via email using Gmail SMTP, but additional notification methods (e.g., Slack, WebSockets, SMS) can be implemented.
@@ -214,6 +219,52 @@ spring.mail.password=test
 ```
 
 ---
+
+
+## ⚠️ Exception Management & Logging  
+
+The application includes a **centralized exception handling and logging system** to ensure that errors are properly captured, logged, and returned to the client in a structured format.  
+
+
+### 🛠 Centralized Exception Handling  
+
+All exceptions are handled **globally** in `CustomGlobalExceptionHandler`, so developers **do not need to log errors manually in individual services or controllers**.  
+
+✔ **Consistent error responses** for API clients.  
+✔ **Automatic logging of all exceptions**, including validation errors, authentication failures, and external API issues.  
+✔ **Separation of concerns**, making it easy to extend exception handling without modifying business logic.  
+
+This means that **whenever an exception occurs, it is automatically logged**—developers don’t need to write explicit logging statements for every error scenario.  
+
+The following exceptions are handled centrally:  
+
+| Exception Type                | HTTP Status | Description |
+|--------------------------------|------------|-------------|
+| `MethodArgumentNotValidException` | `400 Bad Request` | Validation errors in API requests. |
+| `RegistrationException`         | `400 Bad Request` | User registration failure. |
+| `AuthenticationException`       | `401 Unauthorized` | Failed authentication attempts. |
+| `EntityNotFoundException`       | `404 Not Found` | Requested resource not found. |
+| `DataProcessingException`       | `400 Bad Request` | General data processing failure. |
+| `DropBoxProcessingException`    | `500 Internal Server Error` | Dropbox API processing failure. |
+
+### 📜 Structured Logging  
+
+The logging system captures key events and errors in separate logs to facilitate debugging and monitoring.  
+
+| Log File | Purpose |
+|----------|---------|
+| `logs/errors.log` | Stores **all critical application errors**, managed centrally in `CustomGlobalExceptionHandler`. |
+| `logs/user-registrations.log` | Logs **new user registration attempts**, both successful and failed. |
+| `logs/app-events.log` | Captures **important application events** such as project creation, task assignments, and permission changes. |
+
+By maintaining separate log files, the system allows for **better monitoring and faster issue resolution**.  
+
+
+This approach keeps error management **consistent, centralized, and scalable**.   
+
+
+---
+
 
 ## 🌐 API Endpoints  
 

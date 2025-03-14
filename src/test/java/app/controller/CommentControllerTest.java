@@ -1,5 +1,7 @@
 package app.controller;
 
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -9,6 +11,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.testcontainers.shaded.org.awaitility.Awaitility.await;
 
 import app.dto.comment.CommentCreateRequestDto;
 import app.dto.comment.CommentDto;
@@ -77,13 +80,18 @@ class CommentControllerTest {
 
         //NOTIFICATION
         String notificationMsg = "NEW PROJECT: comment has been added";
-        String emailResponse = webClient.get()
-                .uri("/api/v2/messages")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
 
-        assertTrue(emailResponse.contains(notificationMsg));
+        await()
+                .atMost(5, SECONDS)
+                .pollInterval(500, MILLISECONDS)
+                .until(() -> {
+                    String emailResponse = webClient.get()
+                            .uri("/api/v2/messages")
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+                    return emailResponse.contains(notificationMsg);
+                });
     }
 
     @Test
@@ -126,13 +134,17 @@ class CommentControllerTest {
 
         //NOTIFICATION
         String notificationMsg = "NEW PROJECT: comment has been deleted";
-        String emailResponse = webClient.get()
-                .uri("/api/v2/messages")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        assertTrue(emailResponse.contains(notificationMsg));
+        await()
+                .atMost(5, SECONDS)
+                .pollInterval(500, MILLISECONDS)
+                .until(() -> {
+                    String emailResponse = webClient.get()
+                            .uri("/api/v2/messages")
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+                    return emailResponse.contains(notificationMsg);
+                });
     }
 
     @Test
@@ -177,13 +189,17 @@ class CommentControllerTest {
 
         //NOTIFICATION
         String notificationMsg = "NEW PROJECT: comment has been changed";
-        String emailResponse = webClient.get()
-                .uri("/api/v2/messages")
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
-
-        assertTrue(emailResponse.contains(notificationMsg));
+        await()
+                .atMost(5, SECONDS)
+                .pollInterval(500, MILLISECONDS)
+                .until(() -> {
+                    String emailResponse = webClient.get()
+                            .uri("/api/v2/messages")
+                            .retrieve()
+                            .bodyToMono(String.class)
+                            .block();
+                    return emailResponse.contains(notificationMsg);
+                });
     }
 
     @Test

@@ -35,4 +35,4 @@ build/
 *.env
 *.properties
 
-google-drive-credentials.json
+src/main/resources/google-drive-credentials.json

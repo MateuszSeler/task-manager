@@ -1,6 +1,7 @@
 package app.security;
 
 import app.dto.token.ExternalTokenDto;
+import app.exception.DropBoxProcessingException;
 import app.model.Token;
 import app.repository.TokenRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -85,7 +86,7 @@ public class DropBoxTokenServiceImpl {
             return externalTokenDto;
 
         } catch (IOException | InterruptedException e) {
-            throw new RuntimeException("Getting new token from Dropbox api failed", e);
+            throw new DropBoxProcessingException("Getting new token from Dropbox api failed", e);
         }
     }
 }

@@ -12,6 +12,8 @@ import app.repository.UserRepository;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
+    private static final Logger userLogger = LogManager.getLogger("UserRegistration");
+    private static final Logger appLogger = LogManager.getLogger("ApplicationLogger");
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
@@ -39,6 +43,12 @@ public class UserServiceImpl implements UserService {
         User user = userMapper.toModel(userRegistrationRequestDto);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.getRoles().add(getDefaultUserRole());
+
+        userLogger.info("user id: " + user.getId()
+                + "user email: " + user.getEmail());
+        appLogger.info("new user with email: "
+                + user.getEmail()
+                + " successfully register into app");
 
         return userMapper.toDto(userRepository.save(user));
     }
@@ -65,6 +75,7 @@ public class UserServiceImpl implements UserService {
                 .setFirstName(requestDto.getFirstName())
                 .setLastName(requestDto.getLastName())
                 .setPassword(requestDto.getPassword());
+
         return userMapper.toDto(userRepository.save(user));
     }
 

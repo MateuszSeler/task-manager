@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "authentication manger",
-        description = "Endpoints for authentication users in book shop app")
+        description = "Endpoints for authentication users in task manager")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/authentication")

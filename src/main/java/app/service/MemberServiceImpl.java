@@ -12,6 +12,8 @@ import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @Component("memberService")
 public class MemberServiceImpl implements MemberService {
+    private static final Logger appLogger = LogManager.getLogger("ApplicationLogger");
     private final ProjectRepository projectRepository;
     private final UserRepository userRepository;
     private final UserMapper userMapper;
@@ -56,6 +59,10 @@ public class MemberServiceImpl implements MemberService {
 
         project.getProjectMembers().add(user);
         projectRepository.save(project);
+        appLogger.info("project: "
+                + project.getName()
+                + "have new member: "
+                + user.getEmail());
 
         return project.getProjectMembers()
                 .stream()
@@ -85,6 +92,10 @@ public class MemberServiceImpl implements MemberService {
 
         project.getProjectMembers().remove(user);
         projectRepository.save(project);
+        appLogger.info("member: "
+                + user.getEmail()
+                + " was removed from the project: "
+                + project.getName());
 
         return project.getProjectMembers()
                 .stream()
@@ -110,6 +121,10 @@ public class MemberServiceImpl implements MemberService {
 
         project.getProjectManagers().add(user);
         projectRepository.save(project);
+        appLogger.info("project: "
+                + project.getName()
+                + "have new manager: "
+                + user.getEmail());
 
         return project.getProjectManagers()
                 .stream()
@@ -135,6 +150,10 @@ public class MemberServiceImpl implements MemberService {
 
         project.getProjectManagers().remove(user);
         projectRepository.save(project);
+        appLogger.info("member: "
+                + user.getEmail()
+                + " is no longer manager of the project: "
+                + project.getName());
 
         return project.getProjectManagers()
                 .stream()
@@ -151,7 +170,7 @@ public class MemberServiceImpl implements MemberService {
     @Transactional(readOnly = true)
     private User getUserByEmailOrThrowEntityNotFoundException(@NotNull String userEmail) {
         return userRepository.findByEmail(userEmail).orElseThrow(
-                () -> new EntityNotFoundException("User with id: " + userEmail + " not found"));
+                () -> new EntityNotFoundException("User with email: " + userEmail + " not found"));
     }
 
     @Transactional(readOnly = true)

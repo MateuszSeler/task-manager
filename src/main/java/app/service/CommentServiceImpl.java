@@ -106,7 +106,7 @@ public class CommentServiceImpl implements CommentService {
     @Transactional(readOnly = true)
     private User getUserByEmailOrThrowEntityNotFoundException(@NotNull String userEmail) {
         return userRepository.findByEmail(userEmail).orElseThrow(
-                () -> new EntityNotFoundException("User with id: " + userEmail + " not found"));
+                () -> new EntityNotFoundException("User with email: " + userEmail + " not found"));
     }
 
     @Transactional(readOnly = true)
