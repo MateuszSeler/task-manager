@@ -1,0 +1,31 @@
+databaseChangeLog:
+  - changeSet:
+      id: create-calendar_blocks-table
+      author: mseler
+      changes:
+        - createTable:
+            tableName: calendar_blocks
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: task
+                  type: bigint
+                  constraints:
+                    unique: true
+                    nullable: false
+              - column:
+                  name: beginning
+                  type: datetime
+                  constraints:
+                    nullable: false
+              - column:
+                  name: end
+                  type: datetime
+                  constraints:
+                    nullable: false

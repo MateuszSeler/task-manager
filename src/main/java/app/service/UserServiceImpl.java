@@ -6,7 +6,7 @@ import app.exception.EntityNotFoundException;
 import app.exception.RegistrationException;
 import app.mapper.UserMapper;
 import app.model.Role;
-import app.model.User;
+import app.model.user.User;
 import app.repository.RoleRepository;
 import app.repository.UserRepository;
 import jakarta.validation.Valid;

@@ -10,17 +10,11 @@ services:
     ports:
       - "${MYSQLDB_LOCAL_PORT}:${MYSQLDB_DOCKER_PORT}"
 
-  mailhog:
-    image: mailhog/mailhog
-    ports:
-      - "1025:1025"
-      - "8025:8025"
-
   app:
     depends_on:
       - mysqldb
     restart: on-failure
-    image: book-store-app
+    image: task_manager
     build: .
     environment:
       SPRING_APPLICATION_JSON: |

@@ -1,6 +1,6 @@
 package app.repository;
 
-import app.model.Task;
+import app.model.task.Task;
 import jakarta.validation.constraints.NotNull;
 import java.util.Set;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -6,7 +6,7 @@ import app.exception.DataProcessingException;
 import app.exception.EntityNotFoundException;
 import app.mapper.AttachmentMapper;
 import app.model.Attachment;
-import app.model.Task;
+import app.model.task.Task;
 import app.repository.AttachmentRepository;
 import app.repository.TaskRepository;
 import jakarta.validation.constraints.NotNull;

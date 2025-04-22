@@ -27,3 +27,5 @@ databaseChangeLog:
       file: db.changelog/changes/13-create-tokens-table.yaml
   - include:
       file: db.changelog/changes/14-add-api_name-attachments-table.yaml
+  - include:
+      file: db.changelog/changes/15-create-calendar_blocks-table.yaml

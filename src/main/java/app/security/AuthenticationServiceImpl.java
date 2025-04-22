@@ -3,7 +3,7 @@ package app.security;
 import app.dto.user.UserLoginRequestDto;
 import app.dto.user.UserLoginResponseDto;
 import app.exception.AuthenticationException;
-import app.model.User;
+import app.model.user.User;
 import app.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import app.dto.user.UserRegistrationRequestDto;
 import app.exception.EntityNotFoundException;
 import app.exception.RegistrationException;
-import app.model.User;
+import app.model.user.User;
 import app.repository.UserRepository;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;

@@ -5,7 +5,7 @@ import app.exception.DataProcessingException;
 import app.exception.EntityNotFoundException;
 import app.mapper.UserMapper;
 import app.model.Project;
-import app.model.User;
+import app.model.user.User;
 import app.repository.ProjectRepository;
 import app.repository.UserRepository;
 import jakarta.validation.constraints.NotNull;

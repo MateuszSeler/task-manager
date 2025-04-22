@@ -1,6 +1,6 @@
 package app.repository;
 
-import app.model.User;
+import app.model.user.User;
 import app.validator.Email;
 import java.util.Optional;
 import lombok.NonNull;

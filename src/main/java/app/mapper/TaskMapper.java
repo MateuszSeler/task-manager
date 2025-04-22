@@ -5,7 +5,7 @@ import app.dto.task.TaskCreateRequestDto;
 import app.dto.task.TaskDto;
 import app.exception.DataProcessingException;
 import app.model.Label;
-import app.model.Task;
+import app.model.task.Task;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;

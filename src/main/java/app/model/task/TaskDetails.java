@@ -1,5 +1,7 @@
-package app.model;
+package app.model.task;
 
+import app.model.Label;
+import app.model.Project;
 import app.model.user.User;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -10,6 +12,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,8 +25,8 @@ import lombok.experimental.Accessors;
 @Entity
 @Data
 @Accessors(chain = true)
-@Table(name = "projects")
-public class Project {
+@Table(name = "tasks")
+public class TaskDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -31,27 +34,23 @@ public class Project {
     private String name;
     @Size(max = 1000)
     private String description;
-    private LocalDate startDate;
-    private LocalDate endDate;
     @NotNull
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Task.Priority priority;
     @NotNull
-    @ManyToMany
-    @JoinTable(name = "project_managers",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> projectManagers = new HashSet<>();
+    @Enumerated(EnumType.STRING)
+    private Task.Status status;
+    private LocalDate dueDate;
     @NotNull
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User assignee;
     @ManyToMany
-    @JoinTable(name = "project_members",
-            joinColumns = @JoinColumn(name = "project_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> projectMembers = new HashSet<>();
-
-    public enum Status {
-        INITIATED,
-        IN_PROGRESS,
-        COMPLETED;
-    }
+    @JoinTable(name = "tasks_labels",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "label_id"))
+    private Set<Label> labels = new HashSet<>();
 }

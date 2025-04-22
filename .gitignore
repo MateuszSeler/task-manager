@@ -32,7 +32,7 @@ build/
 ### VS Code ###
 .vscode/
 
+# secrets
+secrets.properties
 *.env
-*.properties
-
 src/main/resources/google-drive-credentials.json

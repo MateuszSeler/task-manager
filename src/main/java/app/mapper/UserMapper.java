@@ -3,7 +3,7 @@ package app.mapper;
 import app.config.MapperConfig;
 import app.dto.user.UserRegistrationRequestDto;
 import app.dto.user.UserResponseDto;
-import app.model.User;
+import app.model.user.User;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;

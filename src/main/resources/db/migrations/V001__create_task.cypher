@@ -1,0 +1,7 @@
+CREATE CONSTRAINT task_id_unique IF NOT EXISTS
+FOR (t:task)
+REQUIRE t.id IS UNIQUE;
+
+CREATE CONSTRAINT task_taskId_exists IF NOT EXISTS
+FOR (t:task)
+REQUIRE t.taskId IS NOT NULL;

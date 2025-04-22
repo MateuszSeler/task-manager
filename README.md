@@ -22,11 +22,15 @@ The backend is implemented using **Spring Boot**, with authentication managed vi
 ## 🔹 Technologies & Requirements  
 - **Java 17**  
 - **Spring Boot**  
-- **Maven** as the build system  
-- **MySQL 8** as the database  
+- **Maven** – Build system  
+- **MySQL 8** – Database  
 - **Docker** – Includes `Dockerfile` and `docker-compose.yml`  
-- **JUnit, Testcontainers** – Integration and unit testing (running in Docker and MailHog)  
+- **Spring Security + JWT** – User authentication & authorization  
+- **JUnit, Testcontainers, Awaitility, Mockito** – Unit and integration testing (running in Docker and MailHog)  
 - **Liquibase** – Database versioning and migration  
+- **Log4j2** – Centralized logging and error tracking  
+- **MapStruct** – Automatic DTO ↔ Entity mapping  
+- **Lombok** – Reduces boilerplate code (e.g., builders, getters/setters)  
 
 ---
 
@@ -180,24 +184,27 @@ spring.mail.properties.mail.smtp.writetimeout=5000
 
 ---
 
-## 🧪 Testing & Configuration  
+## 🧪 Testing
 
 The application includes **unit tests, integration tests, and database migration tests** using:  
 
-✔ **JUnit 5** – Unit and integration testing framework  
-✔ **Testcontainers** – Runs database and email tests in Docker containers  
-✔ **MailHog** – Email testing container  
-✔ **Mockito** – Mocking dependencies for unit tests  
-✔ **Liquibase** – Database migration verification  
+✔ **Unit tests** – Verifying individual components such as services, mappers, and validators.  
+✔ **Integration tests** – Testing interactions between different layers (e.g., repository + database, service + external APIs).  
+✔ **Database migration tests** – Ensuring schema consistency with **Liquibase**.  
+✔ **Email testing** – Simulating email notifications using **MailHog**.  
+✔ **Asynchronous testing** – Verifying non-blocking operations with **Awaitility**.  
 
-### 🎯 Test Strategy  
+### 🛠 Tools & Libraries Used  
 
-| Type               | Framework          | Purpose |
-|--------------------|-------------------|---------|
-| **Unit Tests**     | JUnit 5, Mockito  | Testing individual components (services, validators, mappers) |
-| **Integration Tests** | Testcontainers | Testing interaction with the database and external dependencies |
-| **Security Tests** | Spring Security Test | Ensuring proper authentication & authorization |
-| **Email Tests** | MailHog (Docker) | Testing email notifications |
+| 🔹 Tool / Library  | 🔹 Purpose |
+|--------------------|--------------------------------|
+| **JUnit 5**        | Core framework for unit and integration testing. |
+| **Mockito**        | Mocking framework for dependency isolation in unit tests. |
+| **Testcontainers** | Runs database and email tests in **Docker containers**. |
+| **MailHog**        | Simulates an SMTP server for email notification testing. |
+| **Liquibase**      | Manages database migrations and ensures schema consistency. |
+| **Awaitility**     | Helps test **asynchronous operations** by waiting for expected conditions. |
+
 
 ### ⚙️ Test Configuration in application-test.properties
 The integration tests use a temporary MySQL instance managed by Testcontainers, avoiding the need for a real database.
@@ -216,6 +223,18 @@ spring.mail.host=localhost
 spring.mail.port=1025
 spring.mail.username=test
 spring.mail.password=test
+```
+
+### 🛠 MailHog Troubleshooting  
+
+MailHog sometimes **gets stuck** or stops responding. If that happens, restart it using the following commands:  
+
+```sh
+docker stop mailhog
+docker rm mailhog
+docker run --name mailhog -p 1025:1025 -p 8025:8025 mailhog/mailhog
+After running these commands, MailHog should be accessible again at:
+🔗 Web UI: http://localhost:8025
 ```
 
 ---

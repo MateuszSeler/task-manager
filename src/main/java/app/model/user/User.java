@@ -1,5 +1,6 @@
-package app.model;
+package app.model.user;
 
+import app.model.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

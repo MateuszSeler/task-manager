@@ -7,7 +7,7 @@ import app.exception.EntityNotFoundException;
 import app.mapper.LabelMapper;
 import app.model.Label;
 import app.model.Project;
-import app.model.Task;
+import app.model.task.Task;
 import app.repository.LabelRepository;
 import app.repository.ProjectRepository;
 import app.repository.TaskRepository;
